@@ -1,0 +1,228 @@
+
+
+
+
+
+CREATE TABLE IF NOT EXISTS "USERS" (
+    "USER_ID" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    "NAME" VARCHAR(100) NOT NULL CHECK(length("NAME") >= 2),
+
+    "EMAIL" VARCHAR(255) NOT NULL UNIQUE,
+
+    "PASSWORD" TEXT NOT NULL,
+
+    "CREATED_AT" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- Reports Table
+
+
+-- CREATE TABLE IF NOT EXISTS "REPORTS" (
+
+--     "REPORT_ID" UUID PRIMARY KEY
+--     DEFAULT gen_random_uuid(),
+
+--     "USER_ID" UUID NOT NULL,
+
+--     "FILE_NAME" VARCHAR(255) NOT NULL,
+
+--     "FILE_URL" TEXT NOT NULL,
+
+--     "CLOUDINARY_PUBLIC_ID" TEXT NOT NULL,
+
+--     "STATUS" VARCHAR(20) NOT NULL
+--     DEFAULT 'UPLOADED'
+--     CHECK (
+--         "STATUS" IN (
+--             'UPLOADED',
+--             'PROCESSING',
+--             'COMPLETED',
+--             'FAILED'
+--         )
+--     ),
+
+--     "REPORT_SUMMARY" TEXT,
+
+--     "UPLOAD_DATE" TIMESTAMP NOT NULL
+--     DEFAULT CURRENT_TIMESTAMP,
+
+--     "ANALYSIS_DATE" TIMESTAMP,
+
+--     FOREIGN KEY ("USER_ID")
+--     REFERENCES "USERS"("USER_ID")
+--     ON DELETE CASCADE
+-- );
+
+CREATE TABLE IF NOT EXISTS "REPORTS" (
+
+    "REPORT_ID" UUID PRIMARY KEY
+    DEFAULT gen_random_uuid(),
+
+    "USER_ID" UUID NOT NULL,
+
+    "FILE_URL" TEXT NOT NULL,
+
+    "FILE_NAME" VARCHAR(255) NOT NULL,
+
+    "CLOUDINARY_PUBLIC_ID" TEXT NOT NULL,
+
+    "STATUS" VARCHAR(20) NOT NULL
+    DEFAULT 'UPLOADED'
+    CHECK (
+        "STATUS" IN (
+            'UPLOADED',
+            'PROCESSING',
+            'COMPLETED',
+            'FAILED'
+        )
+    ),
+
+    "REPORT_SUMMARY" TEXT,
+
+    "DOCTOR_RECOMMENDATION" VARCHAR(30)
+    CHECK (
+        "DOCTOR_RECOMMENDATION" IN (
+            'NOT_REQUIRED',
+            'CONSIDER_VISIT',
+            'RECOMMENDED'
+        )
+    ),
+
+    "HEALTH_SCORE" INTEGER
+    CHECK (
+        "HEALTH_SCORE" >= 0
+        AND
+        "HEALTH_SCORE" <= 100
+    ),
+
+    "TOTAL_TESTS" INTEGER DEFAULT 0,
+
+    "NORMAL_TESTS" INTEGER DEFAULT 0,
+
+    "BORDERLINE_TESTS" INTEGER DEFAULT 0,
+
+    "CRITICAL_TESTS" INTEGER DEFAULT 0,
+
+    "UPLOADED_DATE" TIMESTAMP
+    DEFAULT CURRENT_TIMESTAMP,
+
+    "ANALYSIS_DATE" TIMESTAMP,
+
+    FOREIGN KEY ("USER_ID")
+    REFERENCES "USERS"("USER_ID")
+    ON DELETE CASCADE
+);
+
+
+-- CREATE TABLE IF NOT EXISTS "ANALYSIS" (
+
+--     "ANALYSIS_ID" UUID PRIMARY KEY
+--     DEFAULT gen_random_uuid(),
+
+--     "REPORT_ID" UUID NOT NULL,
+
+--     "ORGAN_NAME" VARCHAR(100) NOT NULL,
+
+--     "ORGAN_STATUS" VARCHAR(20) NOT NULL
+--     CHECK (
+--         "ORGAN_STATUS" IN (
+--             'NORMAL',
+--             'BORDERLINE',
+--             'CRITICAL'
+--         )
+--     ),
+
+--     "ORGAN_EXPLANATION" TEXT NOT NULL,
+
+--     "TEST_NAME" VARCHAR(255) NOT NULL,
+
+--     "RESULT" VARCHAR(100) NOT NULL,
+
+--     "REFERENCE_RANGE" VARCHAR(100),
+
+--     "TEST_STATUS" VARCHAR(20) NOT NULL
+--     CHECK (
+--         "TEST_STATUS" IN (
+--             'NORMAL',
+--             'BORDERLINE',
+--             'CRITICAL'
+--         )
+--     ),
+
+--     "CREATED_AT" TIMESTAMP
+--     DEFAULT CURRENT_TIMESTAMP,
+
+--     FOREIGN KEY ("REPORT_ID")
+--     REFERENCES "REPORTS"("REPORT_ID")
+--     ON DELETE CASCADE
+-- );
+
+CREATE TABLE IF NOT EXISTS "REPORT_ANALYSIS" (
+
+    "ANALYSIS_ID" UUID PRIMARY KEY
+    DEFAULT gen_random_uuid(),
+
+    "REPORT_ID" UUID NOT NULL,
+
+    "ORGAN_NAME" VARCHAR(100) NOT NULL,
+
+    "ORGAN_STATUS" VARCHAR(20) NOT NULL
+    CHECK (
+        "ORGAN_STATUS" IN (
+            'NORMAL',
+            'BORDERLINE',
+            'CRITICAL'
+        )
+    ),
+
+    "ORGAN_EXPLANATION" TEXT,
+
+    "CREATED_AT" TIMESTAMP
+    DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY ("REPORT_ID")
+    REFERENCES "REPORTS"("REPORT_ID")
+    ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS "TEST_RESULTS" (
+
+    "TEST_RESULT_ID" UUID PRIMARY KEY
+    DEFAULT gen_random_uuid(),
+
+    "ANALYSIS_ID" UUID NOT NULL,
+
+    "TEST_NAME" VARCHAR(255) NOT NULL,
+
+    "RESULT" VARCHAR(100),
+
+    "REFERENCE_RANGE" VARCHAR(100),
+
+    "TEST_STATUS" VARCHAR(20) NOT NULL
+    CHECK (
+        "TEST_STATUS" IN (
+            'NORMAL',
+            'BORDERLINE',
+            'CRITICAL'
+        )
+    ),
+
+    "CREATED_AT" TIMESTAMP
+    DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY ("ANALYSIS_ID")
+    REFERENCES "REPORT_ANALYSIS"("ANALYSIS_ID")
+    ON DELETE CASCADE
+);
+
+
+select * from "USERS";
+select * FROM "REPORTS";
+select * from "ANALYSIS"
+drop table "REPORTS"
+drop table "ANALYSIS"
+
+
