@@ -29,14 +29,15 @@ export const fullReportAnalysis = async(reportId : any , cookieStore : any) => {
     }
 }
 
-export const fetchAllreports = async(cookieStore : any) => {
+export const fetchAllreports = async(params : any , cookieStore : any) => {
 
     console.log("--------Inside getting all reports---------");
+    console.log("-----------params---------" , params)
     try{
 
         console.log(`${BASE_URL}${REPORT_ENDPOINTS.ALL_REPORTS}`);
-        const response = await axios.get(`${BASE_URL}${REPORT_ENDPOINTS.ALL_REPORTS}` , {
-            headers : {cookie : cookieStore}
+        const response = await axios.get(`${BASE_URL}${REPORT_ENDPOINTS.ALL_REPORTS}?` , {
+            params , headers : {cookie : cookieStore}
         })
 
         return response.data;

@@ -227,68 +227,145 @@ export const getFullAnalysisQuery = async(reportId : any) => {
 }
 
 export const getAllReports = async (
-    userId: string,
-    filter: any
+  userId: string,
+  filter: any
 ) => {
 
-    const queryParams: any[] = [];
-    const filterConditions: string[] = [];
+  const conditions: string[] = [];
+  const values: any[] = [];
 
-    let queryText = `
-        SELECT *
-        FROM "REPORTS"
-    `;
+  let query = `
+    SELECT *
+    FROM "REPORTS"
+  `;
 
-    queryParams.push(userId);
+  values.push(userId);
 
-    filterConditions.push(
-        `"USER_ID" = $${queryParams.length}`
+  conditions.push(
+    `"USER_ID" = $${values.length}`
+  );
+
+  // Report Name
+  if (filter.reportName?.trim()) {
+    values.push(`%${filter.reportName.trim()}%`);
+
+    conditions.push(
+      `"REPORT_NAME" ILIKE $${values.length}`
     );
+  }
 
-    if (filter.reportName) {
+  // Report Type (Case Insensitive)
+  if (filter.reportType?.trim()) {
+    values.push(filter.reportType.trim());
 
-        queryParams.push(`%${filter.reportName}%`);
+    conditions.push(
+      `"REPORT_TYPE" ILIKE $${values.length}`
+    );
+  }
 
-        filterConditions.push(
-            `"REPORT_NAME" ILIKE $${queryParams.length}`
-        );
-    }
+  // Health Status (Case Insensitive)
+  if (filter.healthStatus?.trim()) {
+    values.push(filter.healthStatus.trim());
 
-    if (filter.reportType) {
+    conditions.push(
+      `"HEALTH_STATUS" ILIKE $${values.length}`
+    );
+  }
 
-        queryParams.push(filter.reportType);
+  // Start Date
+  if (filter.startDate) {
+    values.push(filter.startDate);
 
-        filterConditions.push(
-            `"REPORT_TYPE" = $${queryParams.length}`
-        );
-    }
+    conditions.push(
+      `"UPLOADED_DATE" >= $${values.length}`
+    );
+  }
 
-    if (filter.healthStatus) {
+  // End Date
+  if (filter.endDate) {
+    values.push(filter.endDate);
 
-        queryParams.push(filter.healthStatus);
+    conditions.push(
+      `"UPLOADED_DATE" <= $${values.length}`
+    );
+  }
 
-        filterConditions.push(
-            `"HEALTH_STATUS" = $${queryParams.length}`
-        );
-    }
+  // Min Score
+  if (
+    filter.minScore !== undefined &&
+    filter.minScore !== ""
+  ) {
+    values.push(Number(filter.minScore));
 
-    if (filterConditions.length > 0) {
+    conditions.push(
+      `"HEALTH_SCORE" >= $${values.length}`
+    );
+  }
 
-        queryText += `
-            WHERE ${filterConditions.join(' AND ')}
-        `;
-    }
+  // Max Score
+  if (
+    filter.maxScore !== undefined &&
+    filter.maxScore !== ""
+  ) {
+    values.push(Number(filter.maxScore));
 
-    queryText += `
+    conditions.push(
+      `"HEALTH_SCORE" <= $${values.length}`
+    );
+  }
+
+  query += `
+    WHERE ${conditions.join(" AND ")}
+  `;
+
+  // Sorting
+  switch (filter.sortBy) {
+
+    case "oldest":
+      query += `
+        ORDER BY "UPLOADED_DATE" ASC
+      `;
+      break;
+
+    case "scoreHigh":
+      query += `
+        ORDER BY "HEALTH_SCORE" DESC
+      `;
+      break;
+
+    case "scoreLow":
+      query += `
+        ORDER BY "HEALTH_SCORE" ASC
+      `;
+      break;
+
+    default:
+      query += `
         ORDER BY "UPLOADED_DATE" DESC
-    `;
+      `;
+  }
 
-    const result = await pool.query(
-        queryText,
-        queryParams
-    );
+  // Pagination
+  const page = Number(filter.page) || 1;
+  const limit = Number(filter.limit) || 10;
 
-    console.log(result.rows);
+  const offset = (page - 1) * limit;
 
-    return result.rows;
+  values.push(limit);
+  values.push(offset);
+
+  query += `
+    LIMIT $${values.length - 1}
+    OFFSET $${values.length}
+  `;
+
+  console.log("Query:", query);
+  console.log("Values:", values);
+
+  const result = await pool.query(
+    query,
+    values
+  );
+
+  return result.rows;
 };

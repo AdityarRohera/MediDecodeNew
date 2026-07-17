@@ -3,7 +3,6 @@
 import { X, Calendar, Filter } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter , usePathname , useSearchParams } from "next/navigation";
-import { useCallback } from "react";
 
 export default function FilterModal({onClose}: {onClose: () => void}) {
 
@@ -11,7 +10,7 @@ export default function FilterModal({onClose}: {onClose: () => void}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [filterForm , setFilterForm] = useState<any>({ReportType : "" , Status : "" , StartDate : "" , EndDate : "" , MinRange : "0" , MaxRange : "100" , SortBy : "" , ReportCount:"" });
+  const [filterForm , setFilterForm] = useState<any>({reportType : "" , healthStatus : "" , startDate : "" , endDate : "" , minScore : "0" , maxScore : "100" , sortBy : "" , page:""  , limit:""});
 
   const changeHandler = (e : any) => {
     const {value , name} = e.target;
@@ -26,7 +25,7 @@ export default function FilterModal({onClose}: {onClose: () => void}) {
   console.log(filterForm);
 
   const resetHandler = () => {
-    setFilterForm({ReportType : "" , Status : "" , StartDate : "" , EndDate : "" , MinRange : "0" , MaxRange : "100" , SortBy : "" , ReportCount:"" });
+    setFilterForm({reportType : "" , healthStatus : "" , startDate : "" , endDate : "" , minScore : "0" , maxScore : "100" , sortBy : "" , page:""  , limit:""});
   }
 
   
@@ -50,14 +49,14 @@ export default function FilterModal({onClose}: {onClose: () => void}) {
 
   useEffect(() => {
   setFilterForm({
-    ReportType: searchParams.get("ReportType") || "",
-    Status: searchParams.get("Status") || "",
-    StartDate: searchParams.get("StartDate") || "",
-    EndDate: searchParams.get("EndDate") || "",
-    MinRange: searchParams.get("MinRange") || "0",
-    MaxRange: searchParams.get("MaxRange") || "100",
-    SortBy: searchParams.get("SortBy") || "newest",
-    ReportCount: searchParams.get("ReportCount") || "10",
+    reportType: searchParams.get("reportType") || "",
+    healthStatus: searchParams.get("healthStatus") || "",
+    startDate: searchParams.get("startDate") || "",
+    endDate: searchParams.get("endDate") || "",
+    minScore: searchParams.get("minScore") || "0",
+    maxScore: searchParams.get("maxScore") || "100",
+    sortBy: searchParams.get("sortBy") || "newest",
+    limit: searchParams.get("limit") || "10", 
   });
 }, [searchParams]);
 
@@ -101,11 +100,11 @@ export default function FilterModal({onClose}: {onClose: () => void}) {
         <div className="grid grid-cols-1 gap-5 p-6 md:grid-cols-2">
           {/* Report Type */}
           <div>
-            <label htmlFor="ReportType" className="mb-2 block text-sm font-medium text-slate-700">
+            <label htmlFor="reportType" className="mb-2 block text-sm font-medium text-slate-700">
               Report Type
             </label>
 
-            <select name="ReportType" onChange={changeHandler} value={filterForm.ReportType || ""} id="ReportType" className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-cyan-500">
+            <select name="reportType" onChange={changeHandler} value={filterForm.reportType || ""} id="reportType" className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-cyan-500">
               <option value="">All Types</option>
               <option value={"blood"}>Blood Test</option>
               <option value={"urine"}>Urine Test</option>
@@ -122,7 +121,7 @@ export default function FilterModal({onClose}: {onClose: () => void}) {
               Status
             </label>
 
-            <select onChange={changeHandler} name="Status" value={filterForm.Status || ""} className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-cyan-500">
+            <select onChange={changeHandler} name="healthStatus" value={filterForm.healthStatus || ""} className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-cyan-500">
               <option value="">All Status</option>
               <option value={"good"}>Good</option>
               <option value={"need-improvment"}>Needs Review</option>
@@ -144,9 +143,9 @@ export default function FilterModal({onClose}: {onClose: () => void}) {
 
               <input
                 onChange={changeHandler}
-                name="StartDate"
+                name="startDate"
                 type="date"
-                value={filterForm.StartDate}
+                value={filterForm.startDate}
                 className="w-full rounded-xl border border-slate-200 pl-10 pr-4 py-3 outline-none focus:border-cyan-500"
               />
             </div>
@@ -167,8 +166,8 @@ export default function FilterModal({onClose}: {onClose: () => void}) {
               <input
                 type="date"
                 onChange={changeHandler}
-                name="EndDate"
-                value={filterForm.EndDate}
+                name="endDate"
+                value={filterForm.endDate}
                 className="w-full rounded-xl border border-slate-200 pl-10 pr-4 py-3 outline-none focus:border-cyan-500"
               />
             </div>
@@ -182,8 +181,8 @@ export default function FilterModal({onClose}: {onClose: () => void}) {
 
             <input
               onChange={changeHandler}
-              name="MinRange"
-              value={filterForm.MinRange}
+              name="minScore"
+              value={filterForm.minScore}
               type="number"
               placeholder="0"
               className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-cyan-500"
@@ -197,8 +196,8 @@ export default function FilterModal({onClose}: {onClose: () => void}) {
 
             <input
               onChange={changeHandler}
-              name="MaxRange"
-              value={filterForm.MaxRange}
+              name="maxScore"
+              value={filterForm.maxScore}
               type="number"
               placeholder="100"
               className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-cyan-500"
@@ -211,7 +210,7 @@ export default function FilterModal({onClose}: {onClose: () => void}) {
               Sort By
             </label>
 
-            <select onChange={changeHandler} name="SortBy" value={filterForm.SortBy} className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-cyan-500">
+            <select onChange={changeHandler} name="sortBy" value={filterForm.sortBy} className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-cyan-500">
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
               <option value="score_high">
@@ -229,7 +228,7 @@ export default function FilterModal({onClose}: {onClose: () => void}) {
               Reports Per Page
             </label>
 
-            <select onChange={changeHandler} name="ReportCount" value={filterForm.ReportCount} className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-cyan-500">
+            <select onChange={changeHandler} name="limit" value={filterForm.limit} className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-cyan-500">
               <option value="5">5 Reports</option>
               <option value="10">10 Reports</option>
               <option value="25">25 Reports</option>

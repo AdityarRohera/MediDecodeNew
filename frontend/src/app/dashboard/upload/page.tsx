@@ -74,7 +74,7 @@ export default function Page() {
 
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 flex justify-center items-center px-4 py-10">
+    <div className="min-h-[calc(100vh-4rem)] bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 flex justify-center items-center px-4 py-10">
       <div className="w-full max-w-5xl">
 
         {/* Header */}

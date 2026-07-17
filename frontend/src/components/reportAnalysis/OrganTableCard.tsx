@@ -180,7 +180,7 @@ export default function OrganTableCard({
 
                 {organ.tests.map((test) => (
                   <tr
-                    key={test.testName}
+                    // key={test.testName}
                     className="
                     border-b
                     border-slate-100

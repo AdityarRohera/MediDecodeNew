@@ -7,6 +7,7 @@ import dotenv from 'dotenv'
 export const AUTH_ENDPOINTS = {
     REGISTER : '/user/register',
     LOGIN : '/user/login',
+    LOGOUT : '/user/logout',
     ME : '/user/profile'
 }
 

@@ -145,50 +145,55 @@ export const getAnalysesReport = async (
 
 
 export const allReports = async (
-    req: Request,
-    res: Response
+  req: Request,
+  res: Response
 ) => {
-    try {
+  try {
+    const userId = (req as AuthenticatedRequest).user.userId;
 
-        const userId = (req as AuthenticatedRequest).user.userId;
+    const filter = {
+      reportName: req.query.reportName as string,
+      reportType: req.query.reportType as string,
+      healthStatus: req.query.healthStatus as string,
 
-        const {ReportName , ReportType , Date , Month , Score , healthStatus} = req.query;
+      startDate: req.query.startDate as string,
+      endDate: req.query.endDate as string,
 
-        const filter = {
-            ReportName, ReportType, Date, Month ,Score, healthStatus
-        }
+      minScore: req.query.minScore as string,
+      maxScore: req.query.maxScore as string,
 
-        // FETCH REPORTS
-        const response = await ReportServices.getReportsService(userId as string , filter);
+      sortBy: req.query.sortBy as string,
 
-        if(response.length === 0){
-            return res.status(300).json({
-                success : false,
-                message : "Reports not found for this user",
-            })
-        }
+      page: Number(req.query.page) || 1,
+      limit: Number(req.query.limit) || 10,
+    };
 
-        return res.status(201).json({
-            success: true,
-            message: "Report Analyze successfully",
-            data: response
-        });
+    console.log("Getting filter -> " , filter);
 
+    const reports =
+      await ReportServices.getReportsService(
+        userId,
+        filter
+      );
 
-    } catch (error) {
+    return res.status(200).json({
+      success: true,
+      message: "Reports fetched successfully",
+      data: reports,
+    });
+  } catch (error) {
+    console.error(
+      "Error fetching reports",
+      error
+    );
 
-        console.error(
-            "Error in getting reports controller",
-            error
-        );
-
-        return res.status(500).json({
-            success: false,
-            message:
-                error instanceof Error
-                    ? error.message
-                    : "Internal Server Error"
-        });
-    }
+    return res.status(500).json({
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Internal Server Error",
+    });
+  }
 };
 

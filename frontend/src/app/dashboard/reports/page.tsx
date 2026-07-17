@@ -14,8 +14,9 @@ export default async function ReportsPage({searchParams} : any) {
   const cookieStore = await cookies();
   let reports: unknown[] = []; // api response
 
+
   try{
-      const res = await fetchAllreports(cookieStore);
+      const res = await fetchAllreports(param , cookieStore);
       reports = res.data;
       console.log("Getting reports of user ---->" , reports);
     
@@ -23,23 +24,23 @@ export default async function ReportsPage({searchParams} : any) {
       console.log("---------Error comes in getting all reports------" , err);
   }
 
+
   // Getting Total reports
   const TotalReports = reports.length;
   const healthyReportsCount = reports.filter((report: any) => report['HEALTH_STATUS'] === 'GOOD').length;
   const AttentionNeededCount = reports.filter((report : any) => report['HEALTH_STATUS'] === 'NEEDS_REVIEW' || report['HEALTH_STATUS'] === 'CRITICAL').length;
 
-
   console.log(TotalReports , "  " , healthyReportsCount , " " , AttentionNeededCount);
 
   return (
-      <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+      <main className="px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <ReportsHeader />
 
         <ReportsStats TotalReports={TotalReports} HealtyReports={healthyReportsCount} AttentionReports={AttentionNeededCount} />
 
         <section className="rounded-lg border border-slate-200 bg-white shadow-sm">
-          <ReportsFilters />
+          <ReportsFilters appliedFilters={param}/>
           <ReportTable reports={reports}/>
           <ReportsPagination currentPage={1} totalPages={5} />
 

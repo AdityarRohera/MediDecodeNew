@@ -474,6 +474,12 @@ export const getAnalysisReportService = async (reportId : any) => {
 }
 
 
-export const getReportsService = async(userId : any , filter : any) => {
-    return await ReportQueries.getAllReports(userId , filter);
-}
+export const getReportsService = async (
+  userId: string,
+  filter: any
+) => {
+  return ReportQueries.getAllReports(
+    userId,
+    filter
+  );
+};

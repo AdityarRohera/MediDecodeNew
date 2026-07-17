@@ -44,12 +44,38 @@ export const signin = async(data : any) => {
 
         return response.data
 
-    } catch(err) {
+    } catch(err: any) {
         console.log("Error comes in signin service" , err);
 
         throw new Error(
             err?.response?.data?.message ||
             "Failed to signin"
+        )
+    }
+}
+
+export const logout = async() => {
+
+    console.log("-------Inside logout service ---------")
+    try{
+
+        const response = await axios.post(
+            `${BASE_URL}${AUTH_ENDPOINTS.LOGOUT}`,
+            {},
+            {
+                withCredentials: true,
+                headers : {Accept : "application/json"}
+            }
+        )
+
+        return response.data
+
+    } catch(err: any) {
+        console.log("Error comes in logout service" , err);
+
+        throw new Error(
+            err?.response?.data?.message ||
+            "Failed to logout"
         )
     }
 }
@@ -66,12 +92,12 @@ export const getCurrentUser = async(cookieStored? : any) => {
 
         return response.data;
 
-    } catch(err){
+    } catch(err: any){
 
         console.log("Getting error in fetching user -----> " , err);
 
         // Unauthorized / No user
-        if (err.response?.status === 401) {
+        if (err?.response?.status === 401) {
             return null;
         }
 
