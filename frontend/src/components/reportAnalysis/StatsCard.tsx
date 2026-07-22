@@ -58,25 +58,24 @@ export default function StatsCard({
       bg-white
       border
       border-slate-200
-      rounded-3xl
-      p-5
+      rounded-2xl
+      p-4
       transition-all
       duration-300
-      hover:shadow-lg
-      hover:-translate-y-1
+      hover:shadow-md
       "
     >
       <div className="flex items-start justify-between">
         <div
           className={`
-          h-12 w-12
-          rounded-2xl
+          h-10 w-10
+          rounded-xl
           flex items-center justify-center
           ${current.iconBg}
         `}
         >
           <Icon
-            className={`h-6 w-6 ${current.iconColor}`}
+            className={`h-5 w-5 ${current.iconColor}`}
           />
         </div>
 
@@ -94,12 +93,12 @@ export default function StatsCard({
         </span>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-4">
         <p className="text-sm text-slate-500">
           {title}
         </p>
 
-        <h2 className="text-4xl font-bold text-slate-900 mt-1">
+        <h2 className="text-3xl font-bold text-slate-900 mt-0.5">
           {value}
         </h2>
       </div>

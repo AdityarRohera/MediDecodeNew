@@ -1,60 +1,56 @@
+"use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import { analyseReport } from "@/services/operations/reports/report";
 
-  "use client";
+export default function UploadedState({
+  reportId,
+}: {
+  reportId: string;
+}) {
 
-  import { useEffect } from "react";
-  import axios from "axios";
-  import { useRouter } from "next/navigation";
-  import { analyseReport } from "@/services/operations/reports/report";
+  const router = useRouter();
 
-  export default function UploadedState({
-    reportId,
-  }: {
-    reportId: string;
-  }) {
+  useEffect(() => {
 
-    const router = useRouter();
+    const startAnalysis = async () => {
 
-    useEffect(() => {
+      try {
 
-      const startAnalysis = async () => {
+        await analyseReport(reportId);
 
-        try {
+        router.refresh();
 
-          console.log("STating anaylising *********************8888");
+      } catch (error) {
+        console.log("Error starting analysis ----> ", error);
+      }
+    };
 
-          const response = await analyseReport(reportId);
-          
-          console.log("Getting response inside uploaded state ------------>  " , response)
+    startAnalysis();
 
-          router.refresh();
+  }, [reportId]);
 
-        } catch (error) {
-          console.log(error);
-        }
-      };
+  return (
+    <div className="flex min-h-[70vh] items-center justify-center px-4">
 
-      startAnalysis();
+      <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-sm">
 
-    }, [reportId]);
-
-    return (
-      <div className="flex min-h-[500px] items-center justify-center">
-
-        <div className="text-center">
-
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent mx-auto" />
-
-          <h1 className="mt-4 text-2xl font-bold">
-            Starting Analysis...
-          </h1>
-
-          <p className="mt-2">
-            Preparing your report
-          </p>
-
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-cyan-500 to-blue-600 shadow-md shadow-blue-900/10">
+          <Loader2 className="h-8 w-8 animate-spin text-white" />
         </div>
 
+        <h1 className="mt-6 text-xl font-semibold text-slate-900">
+          Starting Analysis
+        </h1>
+
+        <p className="mt-2 text-slate-500">
+          Preparing your report for AI analysis...
+        </p>
+
       </div>
-    );
-  }
+
+    </div>
+  );
+}

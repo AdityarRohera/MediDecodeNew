@@ -1,8 +1,12 @@
-
+"use client"
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
+
+  const router = useRouter();
+
   return (
     <nav className="sticky top-0 bg-white border-b z-50">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -19,7 +23,7 @@ export default function Navbar() {
         </div>
 
         <div className="flex gap-3">
-          <button className="px-5 py-2 border rounded-lg">
+          <button onClick={() => router.push('/auth/login')} className="px-5 py-2 border rounded-lg">
             Login
           </button>
 

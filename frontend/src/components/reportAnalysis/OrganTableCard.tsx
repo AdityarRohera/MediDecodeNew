@@ -58,7 +58,7 @@ export default function OrganTableCard({
     <div
       className="
       bg-white
-      rounded-3xl
+      rounded-2xl
       border
       border-slate-200
       shadow-sm
@@ -67,19 +67,19 @@ export default function OrganTableCard({
     >
       {/* CLICKABLE HEADER */}
 
-      <button onClick={() => setOpen(!open)} className="w-full px-7 py-6 text-left flex items-center justify-between hover:bg-slate-50 transition">
+      <button onClick={() => setOpen(!open)} className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-slate-50 transition">
         <div>
           <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-semibold">
+            <h2 className="text-lg font-semibold">
               {organ.organName}
             </h2>
 
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${badgeStyles[organ.organStatus as keyof typeof badgeStyles]}`}>
+            <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${badgeStyles[organ.organStatus as keyof typeof badgeStyles]}`}>
               {organ.organStatus}
             </span>
           </div>
 
-          <div className="flex gap-6 mt-4 text-sm">
+          <div className="flex gap-5 mt-2 text-sm">
             <span className="text-slate-500">
               {organ.tests.length} Tests
             </span>
@@ -100,7 +100,7 @@ export default function OrganTableCard({
 
         <ChevronDown
           className={`
-          h-6 w-6 text-slate-500
+          h-5 w-5 text-slate-500
           transition-transform duration-300
           ${open ? "rotate-180" : ""}
         `}
@@ -126,22 +126,22 @@ export default function OrganTableCard({
 
           {/* AI SUMMARY */}
 
-          <div className="border-t border-slate-100 p-7">
+          <div className="border-t border-slate-100 p-5">
 
             <div
               className="
-              rounded-2xl
+              rounded-xl
               bg-blue-50
               border
               border-blue-100
-              p-5
+              p-4
             "
             >
-              <h3 className="font-semibold text-slate-900">
+              <h3 className="text-sm font-semibold text-slate-900">
                 AI Analysis
               </h3>
 
-              <p className="mt-3 text-slate-600 leading-8">
+              <p className="mt-2 text-sm text-slate-600 leading-6">
                 {organ.organExplanation}
               </p>
             </div>
@@ -157,19 +157,19 @@ export default function OrganTableCard({
               <thead className="bg-slate-50 border-y border-slate-100">
 
                 <tr>
-                  <th className="px-7 py-4 text-left">
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                     Test
                   </th>
 
-                  <th className="px-7 py-4 text-left">
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                     Result
                   </th>
 
-                  <th className="px-7 py-4 text-left">
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                     Reference Range
                   </th>
 
-                  <th className="px-7 py-4 text-left">
+                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                     Status
                   </th>
                 </tr>
@@ -187,19 +187,19 @@ export default function OrganTableCard({
                     hover:bg-slate-50
                   "
                   >
-                    <td className="px-7 py-5 font-medium">
+                    <td className="px-6 py-3.5 text-sm font-medium">
                       {test.TEST_NAME}
                     </td>
 
-                    <td className="px-7 py-5 font-semibold">
+                    <td className="px-6 py-3.5 text-sm font-semibold">
                       {test.RESULT}
                     </td>
 
-                    <td className="px-7 py-5 text-slate-500">
+                    <td className="px-6 py-3.5 text-sm text-slate-500">
                       {test.REFERENCE_RANGE || "-"}
                     </td>
 
-                    <td className="px-7 py-5">
+                    <td className="px-6 py-3.5">
                       {test.TEST_STATUS === "NORMAL" && (
                         <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
                           <CheckCircle2 size={14} />

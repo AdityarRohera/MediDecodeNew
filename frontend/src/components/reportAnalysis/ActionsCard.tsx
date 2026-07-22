@@ -31,20 +31,20 @@ export default function ActionsCard() {
       bg-white
       border
       border-slate-200
-      rounded-3xl
-      p-6
+      rounded-2xl
+      p-5
       shadow-sm
     "
     >
-      <h2 className="font-semibold text-slate-900">
+      <h2 className="text-sm font-semibold text-slate-900">
         Quick Actions
       </h2>
 
-      <p className="text-sm text-slate-500 mt-1">
+      <p className="text-xs text-slate-500 mt-1">
         Manage and export your report
       </p>
 
-      <div className="grid grid-cols-2 gap-3 mt-6">
+      <div className="grid grid-cols-2 gap-2.5 mt-4">
 
         {actions.map((action) => {
           const Icon = action.icon;
@@ -54,8 +54,8 @@ export default function ActionsCard() {
               key={action.label}
               className="
               group
-              p-4
-              rounded-2xl
+              p-3
+              rounded-xl
               border
               border-slate-200
               hover:border-blue-200
@@ -67,9 +67,9 @@ export default function ActionsCard() {
             >
               <div
                 className="
-                h-10
-                w-10
-                rounded-xl
+                h-9
+                w-9
+                rounded-lg
                 bg-slate-100
                 flex
                 items-center
@@ -79,12 +79,12 @@ export default function ActionsCard() {
               "
               >
                 <Icon
-                  size={18}
+                  size={16}
                   className="text-slate-700"
                 />
               </div>
 
-              <p className="mt-3 text-sm font-medium text-slate-900">
+              <p className="mt-2 text-sm font-medium text-slate-900">
                 {action.label}
               </p>
             </button>

@@ -11,14 +11,24 @@ export default function DashboardLayout({
 }) {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
   return (
     <div className="min-h-screen bg-slate-50">
 
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        expanded={sidebarExpanded}
+        onExpandedChange={setSidebarExpanded}
+      />
 
-      {/* Content sits beside the sidebar on large screens */}
-      <div className="lg:pl-64">
+      {/* Content width adjusts with the sidebar instead of staying fixed */}
+      <div
+        className={`transition-all duration-300 ease-in-out ${
+          sidebarExpanded ? "lg:pl-64" : "lg:pl-20"
+        }`}
+      >
 
         <Navbar onMenuClick={() => setSidebarOpen(true)} />
 

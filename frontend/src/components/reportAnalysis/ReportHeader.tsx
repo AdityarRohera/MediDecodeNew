@@ -1,56 +1,107 @@
-import { Download, Share2 } from "lucide-react";
+"use client";
 
-export default function ReportHeader() {
+import { useState } from "react";
+import { Download, Share2, Check } from "lucide-react";
+
+type Props = {
+  reportName: string;
+  reportId: string;
+  uploadedDate: string;
+  healthStatus: string;
+  fileUrl: string;
+};
+
+const statusStyles: Record<string, string> = {
+  GOOD: "bg-emerald-100 text-emerald-700",
+  NEEDS_REVIEW: "bg-amber-100 text-amber-700",
+  CRITICAL: "bg-red-100 text-red-700",
+};
+
+const statusLabels: Record<string, string> = {
+  GOOD: "Healthy",
+  NEEDS_REVIEW: "Needs Review",
+  CRITICAL: "Critical",
+};
+
+export default function ReportHeader({
+  reportName,
+  reportId,
+  uploadedDate,
+  healthStatus,
+  fileUrl,
+}: Props) {
+
+  const [copied, setCopied] = useState(false);
+
+  const formattedDate = uploadedDate
+    ? new Date(uploadedDate).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "-";
+
+  const shareHandler = async () => {
+    await navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div
       className="
       bg-white
-      rounded-3xl
+      rounded-2xl
       border border-slate-200
       shadow-[0_2px_8px_rgba(15,23,42,0.04)]
-      px-8
-      py-7
+      px-6
+      py-5
       flex
-      justify-between
-      items-center
+      flex-col
+      gap-4
+      sm:flex-row
+      sm:justify-between
+      sm:items-center
     "
     >
       <div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3">
 
-          <h1 className="text-[44px] font-bold tracking-[-0.03em] text-slate-900">
-            Complete Blood Count (CBC)
+          <h1 className="text-xl font-bold tracking-[-0.02em] text-slate-900 sm:text-2xl">
+            {reportName}
           </h1>
 
           <span
-            className="
-            px-4
-            py-1.5
+            className={`
+            px-3
+            py-1
             rounded-full
-            bg-emerald-100
-            text-emerald-700
-            text-sm
+            text-xs
             font-semibold
-          "
+            ${statusStyles[healthStatus] || "bg-slate-100 text-slate-600"}
+          `}
           >
-            Analyzed
+            {statusLabels[healthStatus] || healthStatus}
           </span>
 
         </div>
 
-        <p className="mt-3 text-[17px] text-slate-500">
-          Report ID: REP-2026-0018 • Uploaded on May 28, 2026
+        <p className="mt-1.5 text-sm text-slate-500">
+          Report ID: {reportId?.slice(0, 8)} • Uploaded on {formattedDate}
         </p>
 
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex gap-2.5">
 
-        <button
+        <a
+          href={fileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           className="
-          h-12
-          px-6
+          h-10
+          px-4
           rounded-xl
           border
           border-slate-200
@@ -60,17 +111,19 @@ export default function ReportHeader() {
           flex
           items-center
           gap-2
+          text-sm
           font-medium
         "
         >
-          <Download size={18} />
+          <Download size={16} />
           Download PDF
-        </button>
+        </a>
 
         <button
+          onClick={shareHandler}
           className="
-          h-12
-          px-6
+          h-10
+          px-4
           rounded-xl
           border
           border-slate-200
@@ -80,11 +133,12 @@ export default function ReportHeader() {
           flex
           items-center
           gap-2
+          text-sm
           font-medium
         "
         >
-          <Share2 size={18} />
-          Share
+          {copied ? <Check size={16} className="text-emerald-600" /> : <Share2 size={16} />}
+          {copied ? "Copied!" : "Share"}
         </button>
 
       </div>

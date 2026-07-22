@@ -1,24 +1,33 @@
 import {
   FileText,
   Calendar,
-  Database,
+  BadgeCheck,
   Microscope,
 } from "lucide-react";
 
 interface Props {
   reportName: string;
   reportType: string;
-  fileSize: string;
   uploadedAt: string;
+  analyzedAt: string;
   totalTests: number;
   totalOrgans: number;
 }
 
+const formatDate = (date: string) =>
+  date
+    ? new Date(date).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : "-";
+
 export default function ReportInfoCard({
   reportName,
   reportType,
-  fileSize,
   uploadedAt,
+  analyzedAt,
   totalTests,
   totalOrgans,
 }: Props) {
@@ -28,8 +37,8 @@ export default function ReportInfoCard({
       bg-white
       border
       border-slate-200
-      rounded-3xl
-      p-6
+      rounded-2xl
+      p-5
       shadow-sm
     "
     >
@@ -39,9 +48,9 @@ export default function ReportInfoCard({
 
         <div
           className="
-          h-11
-          w-11
-          rounded-2xl
+          h-10
+          w-10
+          rounded-xl
           bg-blue-50
           flex
           items-center
@@ -52,11 +61,11 @@ export default function ReportInfoCard({
         </div>
 
         <div>
-          <h2 className="font-semibold text-slate-900">
+          <h2 className="text-sm font-semibold text-slate-900">
             Report Details
           </h2>
 
-          <p className="text-sm text-slate-500">
+          <p className="text-xs text-slate-500">
             Uploaded document
           </p>
         </div>
@@ -65,9 +74,9 @@ export default function ReportInfoCard({
 
       {/* Report Name */}
 
-      <div className="mt-6">
+      <div className="mt-4">
 
-        <h3 className="font-semibold text-slate-900">
+        <h3 className="text-sm font-semibold text-slate-900">
           {reportName}
         </h3>
 
@@ -75,7 +84,7 @@ export default function ReportInfoCard({
 
       {/* Metadata */}
 
-      <div className="mt-6 space-y-4">
+      <div className="mt-4 space-y-3">
 
         <div className="flex items-center gap-3">
           <Microscope className="w-4 h-4 text-slate-400" />
@@ -86,7 +95,7 @@ export default function ReportInfoCard({
             </p>
 
             <p className="text-sm font-medium">
-              {reportType}
+              {reportType || "General"}
             </p>
           </div>
         </div>
@@ -100,21 +109,21 @@ export default function ReportInfoCard({
             </p>
 
             <p className="text-sm font-medium">
-              {uploadedAt}
+              {formatDate(uploadedAt)}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <Database className="w-4 h-4 text-slate-400" />
+          <BadgeCheck className="w-4 h-4 text-slate-400" />
 
           <div>
             <p className="text-xs text-slate-400">
-              File Size
+              Analyzed On
             </p>
 
             <p className="text-sm font-medium">
-              {fileSize}
+              {formatDate(analyzedAt)}
             </p>
           </div>
         </div>
@@ -123,7 +132,7 @@ export default function ReportInfoCard({
 
       {/* Divider */}
 
-      <div className="h-px bg-slate-100 my-6" />
+      <div className="h-px bg-slate-100 my-4" />
 
       {/* Quick Stats */}
 
@@ -132,16 +141,16 @@ export default function ReportInfoCard({
         <div
           className="
           bg-slate-50
-          rounded-2xl
-          p-4
+          rounded-xl
+          p-3
           text-center
         "
         >
-          <p className="text-2xl font-bold text-slate-900">
+          <p className="text-xl font-bold text-slate-900">
             {totalTests}
           </p>
 
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-500 mt-0.5">
             Tests
           </p>
         </div>
@@ -149,16 +158,16 @@ export default function ReportInfoCard({
         <div
           className="
           bg-slate-50
-          rounded-2xl
-          p-4
+          rounded-xl
+          p-3
           text-center
         "
         >
-          <p className="text-2xl font-bold text-slate-900">
+          <p className="text-xl font-bold text-slate-900">
             {totalOrgans}
           </p>
 
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-500 mt-0.5">
             Organs
           </p>
         </div>

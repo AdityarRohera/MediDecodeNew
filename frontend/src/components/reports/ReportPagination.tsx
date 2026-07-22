@@ -1,21 +1,29 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 interface Props {
   currentPage: number;
-  totalPages: number;
-  onPageChange?: (page: number) => void;
+  hasNextPage: boolean;
 }
 
 export default function ReportsPagination({
   currentPage,
-  totalPages,
-  onPageChange,
+  hasNextPage,
 }: Props) {
-  const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
 
-  if (totalPages <= 1) return null;
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  if (currentPage === 1 && !hasNextPage) return null;
+
+  const goToPage = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", String(page));
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   return (
     <div
@@ -34,26 +42,21 @@ export default function ReportsPagination({
       "
     >
       <p className="text-sm text-slate-500">
-        Showing page{" "}
+        Page{" "}
         <span className="font-medium text-slate-900">
           {currentPage}
-        </span>{" "}
-        of{" "}
-        <span className="font-medium text-slate-900">
-          {totalPages}
         </span>
       </p>
 
-      <div className="flex items-center gap-2 overflow-x-auto">
+      <div className="flex items-center gap-2">
         <button
           disabled={currentPage === 1}
-          onClick={() => onPageChange?.(currentPage - 1)}
+          onClick={() => goToPage(currentPage - 1)}
           aria-label="Previous page"
           className="
             flex
             h-9
             w-9
-            shrink-0
             items-center
             justify-center
             rounded-lg
@@ -69,39 +72,14 @@ export default function ReportsPagination({
           <ChevronLeft size={18} />
         </button>
 
-        {pages.map((page) => (
-          <button
-            key={page}
-            onClick={() => onPageChange?.(page)}
-            className={`
-              h-9
-              min-w-9
-              shrink-0
-              rounded-lg
-              px-3
-              text-sm
-              font-semibold
-              transition
-              ${
-                page === currentPage
-                  ? "bg-cyan-600 text-white shadow-sm shadow-cyan-900/10"
-                  : "border border-slate-200 text-slate-600 hover:bg-slate-50"
-              }
-            `}
-          >
-            {page}
-          </button>
-        ))}
-
         <button
-          disabled={currentPage === totalPages}
-          onClick={() => onPageChange?.(currentPage + 1)}
+          disabled={!hasNextPage}
+          onClick={() => goToPage(currentPage + 1)}
           aria-label="Next page"
           className="
             flex
             h-9
             w-9
-            shrink-0
             items-center
             justify-center
             rounded-lg

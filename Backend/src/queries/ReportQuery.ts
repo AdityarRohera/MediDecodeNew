@@ -254,6 +254,16 @@ export const getAllReports = async (
     );
   }
 
+  // status
+  if(filter.status?.trim()) {
+    values.push(`%${filter.status.trim()}%`);
+
+    conditions.push(
+      `"status" ILIKE $${values.length}`
+    );
+
+  }
+
   // Report Type (Case Insensitive)
   if (filter.reportType?.trim()) {
     values.push(filter.reportType.trim());

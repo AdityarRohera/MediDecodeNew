@@ -155,6 +155,7 @@ export const allReports = async (
       reportName: req.query.reportName as string,
       reportType: req.query.reportType as string,
       healthStatus: req.query.healthStatus as string,
+      status : req.query.status as string,
 
       startDate: req.query.startDate as string,
       endDate: req.query.endDate as string,

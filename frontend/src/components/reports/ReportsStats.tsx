@@ -6,36 +6,35 @@ import StatsCard from "../reportAnalysis/StatsCard";
 //   reports?: unknown[];
 // };
 
-function ReportsStats({ TotalReports , HealtyReports , AttentionReports}: any) {
-  // const totalReports = reports.length || 25;
+function ReportsStats({ TotalReports , HealtyReports , AttentionReports , AverageScore}: any) {
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <StatsCard
         title="Total Reports"
         value={TotalReports || 0}
-        subtitle="+4 this month"
+        subtitle="All uploaded reports"
         variant="purple"
       />
 
       <StatsCard
         title="Healthy"
         value={HealtyReports || 0}
-        subtitle="72% stable"
+        subtitle="Reports in good health"
         variant="green"
       />
 
       <StatsCard
         title="Attention Needed"
         value={AttentionReports || 0}
-        subtitle="Review soon"
+        subtitle="Reports to review"
         variant="yellow"
       />
 
       <StatsCard
         title="Average Score"
-        value={HealtyReports/TotalReports*100 || 0}
-        subtitle="Good range"
+        value={AverageScore || 0}
+        subtitle="Across analyzed reports"
         variant="green"
       />
     </div>

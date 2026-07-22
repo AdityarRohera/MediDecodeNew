@@ -1,89 +1,151 @@
+"use client"
+
+import {
+  Calendar,
+  Eye,
+  FileText,
+  FlaskConical,
+  MoreVertical,
+} from "lucide-react";
+
 import { HealthScoreBadge } from "./HealthScore";
 import { ReportStatus, StatusBadge } from "./StatusBadge";
+import { useRouter } from "next/navigation";
 
-type Report = {
-  id: string;
-  name: string;
-  type: string;
-  date: string;
-  score: number;
-  status: ReportStatus;
-};
+export default function ReportTable({ reports }: any) {
 
-// const reports: Report[] = [
-//   {
-//     id: "CBC-2026-0528",
-//     name: "Complete Blood Count",
-//     type: "Hematology",
-//     date: "May 28, 2026",
-//     score: 86,
-//     status: "GOOD",
-//   },
-//   {
-//     id: "LFT-2026-0521",
-//     name: "Liver Function Panel",
-//     type: "Biochemistry",
-//     date: "May 21, 2026",
-//     score: 74,
-//     status: "ATTENTION",
-//   },
-//   {
-//     id: "LIP-2026-0507",
-//     name: "Lipid Profile",
-//     type: "Cardiology",
-//     date: "May 7, 2026",
-//     score: 91,
-//     status: "GOOD",
-//   },
-//   {
-//     id: "THY-2026-0429",
-//     name: "Thyroid Profile",
-//     type: "Endocrinology",
-//     date: "Apr 29, 2026",
-//     score: 68,
-//     status: "CRITICAL",
-//   },
-// ];
+  const router = useRouter();
 
-export default function ReportTable({reports} : any) {
+  console.log("Geting report --------------------------> " , reports);
   return (
-    <div className="overflow-x-auto bg-white">
-
-      <table className="w-full min-w-190 text-left">
-        <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
+    <div className="overflow-hidden rounded-b-xl">
+      <table className="w-full">
+        <thead className="sticky top-0 bg-slate-50">
           <tr className="border-b border-slate-200">
-            <th className="px-5 py-3">Report</th>
-            <th className="px-5 py-3">Type</th>
-            <th className="px-5 py-3">Date</th>
-            <th className="px-5 py-3">Score</th>
-            <th className="px-5 py-3">Status</th>
-            <th className="px-5 py-3 text-right">Action</th>
+            <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Report
+            </th>
+
+            <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Type
+            </th>
+
+            <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Uploaded
+            </th>
+
+            <th className="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Score
+            </th>
+
+            <th className="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Status
+            </th>
+
+            <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Actions
+            </th>
           </tr>
         </thead>
 
-        <tbody className="divide-y divide-slate-100 text-sm">
-          {reports.map((report : any) => (
+        <tbody className="divide-y divide-slate-100 bg-white">
+          {reports.map((report: any) => {
+            const analyzed =
+              report.STATUS?.toLowerCase() === "completed";
 
-            <tr key={report.REPORT_ID} className="transition hover:bg-slate-50/80">
-              <td className="px-5 py-4">
-                <div className="font-semibold text-slate-950">{report.REPORT_NAME || "REPORT_NAME"}</div>
-                <div className="mt-1 text-xs text-slate-500">{report.REPORT_ID.substring(0 , 8)}</div>
-              </td>
-              <td className="px-5 py-4 text-slate-600">{report.REPORT_TYPE || "REPORT_TYPE"}</td>
-              <td className="px-5 py-4 text-slate-600">{report.UPLOADED_DATE.substring(0,10)}</td>
-              <td className="px-5 py-4">
-                <HealthScoreBadge score={report.HEALTH_SCORE || 50} />
-              </td>
-              <td className="px-5 py-4">
-                <StatusBadge status={report.HEALTH_STATUS || 'GOOD'} />
-              </td>
-              <td className="px-5 py-4 text-right">
-                <button className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700">
-                  View Analysis
-                </button>
-              </td>
-            </tr>
-          ))}
+            return (
+              <tr
+                key={report.REPORT_ID}
+                className="transition-all duration-200 hover:bg-cyan-50/40"
+              >
+                {/* Report */}
+
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50">
+                      <FileText className="h-5 w-5 text-red-500" />
+                    </div>
+
+                    <div>
+                      <h3 className="font-semibold text-slate-900">
+                        {report.REPORT_NAME}
+                      </h3>
+
+                      <p className="mt-1 text-xs text-slate-500">
+                        {report.REPORT_ID.slice(0, 8)}
+                      </p>
+                    </div>
+                  </div>
+                </td>
+
+                {/* Type */}
+
+                <td className="px-6 py-4">
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                    {report.REPORT_TYPE}
+                  </span>
+                </td>
+
+                {/* Date */}
+
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-2 text-slate-600">
+                    <Calendar size={15} />
+                    {report.UPLOADED_DATE.slice(0, 10)}
+                  </div>
+                </td>
+
+                {/* Score */}
+
+                <td className="px-6 py-4 text-center">
+                  <HealthScoreBadge
+                    score={report.HEALTH_SCORE ?? 50}
+                  />
+                </td>
+
+                {/* Status */}
+
+                <td className="px-6 py-4 text-center">
+                  <StatusBadge
+                    status={
+                      (report.HEALTH_STATUS || "GOOD") as ReportStatus
+                    }
+                  />
+                </td>
+
+                {/* Actions */}
+
+                <td className="px-6 py-4">
+                  <div className="flex items-center justify-end gap-2">
+                    {analyzed ? (
+                      <button
+                      onClick={() => router.push(`/dashboard/reports/${report.REPORT_ID}`)}
+                        title="View Analysis"
+                        className="rounded-lg border border-slate-200 p-2.5 transition hover:border-cyan-500 hover:bg-cyan-50"
+                      >
+                        <Eye
+                          size={18}
+                          className="text-cyan-600"
+                        />
+                      </button>
+                    ) : (
+                      <button className="flex items-center gap-2 rounded-lg bg-cyan-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-cyan-700">
+                        <FlaskConical size={16} />
+                        Analyze
+                      </button>
+                    )}
+
+                    <button className="rounded-lg border border-slate-200 p-2.5 transition hover:bg-slate-100">
+                      <MoreVertical
+                        size={18}
+                        className="text-slate-500"
+                      />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

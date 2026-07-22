@@ -10,11 +10,11 @@ export default function ReportsHeader() {
           Reports dashboard
         </span>
 
-        <h1 className="mt-4 text-3xl font-bold text-slate-950 sm:text-4xl">
+        <h1 className="mt-3 text-2xl font-bold text-slate-950 sm:text-3xl">
           My Reports
         </h1>
 
-        <p className="mt-2 text-slate-500">
+        <p className="mt-1.5 text-sm text-slate-500">
           View, manage, and analyze your uploaded medical reports in one place.
         </p>
       </div>

@@ -39,9 +39,16 @@ const navItems = [
 type SidebarProps = {
   open: boolean;
   onClose: () => void;
+  expanded: boolean;
+  onExpandedChange: (expanded: boolean) => void;
 };
 
-export default function Sidebar({ open, onClose }: SidebarProps) {
+export default function Sidebar({
+  open,
+  onClose,
+  expanded,
+  onExpandedChange,
+}: SidebarProps) {
 
   const pathname = usePathname();
 
@@ -54,6 +61,9 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
     return pathname.startsWith(href);
   };
 
+  // Desktop: icon-only rail, expands on hover. Mobile: full drawer when open.
+  const isWide = open || expanded;
+
   return (
     <>
       {/* Dark overlay behind the drawer on mobile */}
@@ -65,21 +75,26 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       )}
 
       <aside
+        onMouseEnter={() => onExpandedChange(true)}
+        onMouseLeave={() => onExpandedChange(false)}
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-200 bg-white transition-transform duration-300 lg:translate-x-0",
-          open ? "translate-x-0" : "-translate-x-full"
+          "fixed inset-y-0 left-0 z-50 flex flex-col overflow-hidden border-r border-slate-200 bg-white transition-all duration-300 ease-in-out lg:translate-x-0",
+          open ? "translate-x-0" : "-translate-x-full",
+          isWide ? "w-64" : "w-20"
         )}
       >
         {/* Logo */}
         <div className="flex h-16 items-center justify-between border-b border-slate-200 px-5">
           <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-cyan-500 to-blue-600 shadow-sm shadow-blue-900/20">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-cyan-500 to-blue-600 shadow-sm shadow-blue-900/20">
               <Activity className="h-5 w-5 text-white" />
             </div>
 
-            <span className="text-lg font-bold tracking-tight text-slate-900">
-              MediDecode
-            </span>
+            {isWide && (
+              <span className="whitespace-nowrap text-lg font-bold tracking-tight text-slate-900">
+                MediDecode
+              </span>
+            )}
           </Link>
 
           <button
@@ -92,10 +107,12 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         </div>
 
         {/* Nav links */}
-        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5">
-          <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-            Menu
-          </p>
+        <nav className="flex-1 space-y-1 overflow-y-auto overflow-x-hidden px-3 py-5">
+          {isWide && (
+            <p className="whitespace-nowrap px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Menu
+            </p>
+          )}
 
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -106,6 +123,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
                 key={item.href}
                 href={item.href}
                 onClick={onClose}
+                title={item.name}
                 className={cn(
                   "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition",
                   active
@@ -121,34 +139,39 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
                 <Icon
                   size={18}
                   className={cn(
+                    "shrink-0",
                     active
                       ? "text-cyan-600"
                       : "text-slate-400 group-hover:text-slate-600"
                   )}
                 />
 
-                {item.name}
+                {isWide && (
+                  <span className="whitespace-nowrap">{item.name}</span>
+                )}
               </Link>
             );
           })}
         </nav>
 
         {/* Footer badge */}
-        <div className="border-t border-slate-200 p-4">
-          <div className="rounded-xl border border-cyan-100 bg-cyan-50/60 p-3">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-cyan-600" />
+        {isWide && (
+          <div className="border-t border-slate-200 p-4">
+            <div className="rounded-xl border border-cyan-100 bg-cyan-50/60 p-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 shrink-0 text-cyan-600" />
 
-              <p className="text-xs font-semibold text-slate-800">
-                Secure & Private
+                <p className="whitespace-nowrap text-xs font-semibold text-slate-800">
+                  Secure & Private
+                </p>
+              </div>
+
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
+                Your reports are encrypted during analysis.
               </p>
             </div>
-
-            <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
-              Your reports are encrypted during analysis.
-            </p>
           </div>
-        </div>
+        )}
       </aside>
     </>
   );

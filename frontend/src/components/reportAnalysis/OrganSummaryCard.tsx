@@ -57,14 +57,14 @@ export default function OrganSummaryCard({
     <div
       className="
       bg-white
-      rounded-3xl
+      rounded-2xl
       border border-slate-200
-      p-6
+      p-5
       shadow-sm
     "
     >
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-900">
+        <h2 className="text-base font-semibold text-slate-900">
           Organ Analysis
         </h2>
 
@@ -73,7 +73,7 @@ export default function OrganSummaryCard({
         </span>
       </div>
 
-      <div className="mt-6 space-y-3">
+      <div className="mt-4 space-y-2.5">
 
         {analysis.map((organ) => {
           const config = getStatusConfig(
@@ -89,8 +89,8 @@ export default function OrganSummaryCard({
               flex
               items-center
               justify-between
-              p-4
-              rounded-2xl
+              p-3
+              rounded-xl
               border
               border-slate-100
               hover:bg-slate-50
@@ -132,7 +132,7 @@ export default function OrganSummaryCard({
 
       </div>
 
-      <div className="mt-6 pt-5 border-t border-slate-100">
+      <div className="mt-4 pt-4 border-t border-slate-100">
 
         <div className="flex justify-between text-sm">
 

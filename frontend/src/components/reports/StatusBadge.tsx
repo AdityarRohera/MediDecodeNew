@@ -1,34 +1,34 @@
+import { CheckCircle2, Clock3 } from "lucide-react";
 
+export type ReportStatus = "GOOD" | "ATTENTION" | "PENDING";
 
-export type ReportStatus = "GOOD" | "ATTENTION" | "CRITICAL";
+export function StatusBadge({
+  status,
+}: {
+  status: ReportStatus;
+}) {
+  switch (status) {
+    case "GOOD":
+      return (
+        <span className="flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
+          <CheckCircle2 size={16} />
+          Healthy
+        </span>
+      );
 
-export function StatusBadge({ status }: { status: ReportStatus }) {
-  const styles = {
-    GOOD:
-      "bg-emerald-50 text-emerald-700 ring-emerald-600/10",
+    case "ATTENTION":
+      return (
+        <span className="rounded-full bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700">
+          Attention
+        </span>
+      );
 
-    ATTENTION:
-      "bg-amber-50 text-amber-700 ring-amber-600/10",
-
-    CRITICAL:
-      "bg-red-50 text-red-700 ring-red-600/10",
-  };
-
-  return (
-    <span
-      className={`
-        inline-flex
-        rounded-full
-        px-2.5
-        py-1
-        text-xs
-        font-semibold
-        ring-1
-        ring-inset
-        ${styles[status]}
-    `}
-    >
-      {status === "ATTENTION" ? "Needs review" : status.toLowerCase()}
-    </span>
-  );
+    default:
+      return (
+        <span className="flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-600">
+          <Clock3 size={16} />
+          Pending
+        </span>
+      );
+  }
 }

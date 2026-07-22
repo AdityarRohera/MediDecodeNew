@@ -3,10 +3,12 @@
 import { register, signin } from '@/services/operations/user/auth';
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 function LoginForm() {
     
     const router = useRouter();
+    const {fetchUser} = useAuth();
 
     const[formData , setFormData] = useState({email : "" , password : ""});
     const [loading , setLoading] = useState(false);
@@ -29,6 +31,8 @@ function LoginForm() {
             setLoading(true);
 
             await signin(formData);
+
+            await fetchUser();
 
             router.push('/dashboard');
 

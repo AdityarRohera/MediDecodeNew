@@ -17,7 +17,7 @@ export default function HealthScoreCard({
   borderlineTests,
   criticalTests,
 }: Props) {
-  const circumference = 2 * Math.PI * 66;
+  const circumference = 2 * Math.PI * 54;
   const offset =
     circumference - (score / 100) * circumference;
 
@@ -48,47 +48,50 @@ export default function HealthScoreCard({
 
   const status = getStatus();
 
+  const ringColor =
+    score >= 60 ? "#22C55E" : score >= 40 ? "#F59E0B" : "#EF4444";
+
   return (
     <div
       className="
       bg-white
       border
       border-slate-200
-      rounded-3xl
-      p-6
+      rounded-2xl
+      p-5
       shadow-sm
       h-full
       "
     >
-      <h2 className="text-lg font-semibold text-slate-900">
+      <h2 className="text-base font-semibold text-slate-900">
         Health Score
       </h2>
 
       {/* Score Ring */}
 
-      <div className="flex justify-center mt-8">
-        <div className="relative w-44 h-44">
+      <div className="flex justify-center mt-5">
+        <div className="relative w-36 h-36">
 
           <svg
-            width="176"
-            height="176"
+            width="144"
+            height="144"
             className="-rotate-90"
           >
             <circle
-              cx="88"
-              cy="88"
-              r="66"
+              cx="72"
+              cy="72"
+              r="54"
               stroke="#E2E8F0"
-              strokeWidth="12"
+              strokeWidth="10"
               fill="transparent"
             />
 
             <circle
-              cx="88"
-              cy="88"
-              r="66"
-              stroke="#22C55E"
-              strokeWidth="12"
+              cx="72"
+              cy="72"
+              r="54"
+              stroke={ringColor}
+              strokeWidth="10"
               strokeLinecap="round"
               fill="transparent"
               strokeDasharray={circumference}
@@ -97,11 +100,11 @@ export default function HealthScoreCard({
           </svg>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <h1 className="text-5xl font-bold text-slate-900">
+            <h1 className="text-4xl font-bold text-slate-900">
               {score}
             </h1>
 
-            <span className="text-sm text-slate-400">
+            <span className="text-xs text-slate-400">
               /100
             </span>
           </div>
@@ -110,14 +113,14 @@ export default function HealthScoreCard({
 
       {/* Status */}
 
-      <div className="text-center mt-4">
+      <div className="text-center mt-3">
         <h3
-          className={`text-xl font-semibold ${status.color}`}
+          className={`text-lg font-semibold ${status.color}`}
         >
           {status.label}
         </h3>
 
-        <p className="text-sm text-slate-500 mt-2 leading-6">
+        <p className="text-xs text-slate-500 mt-1.5 leading-5">
           Based on the overall analysis of your
           laboratory results.
         </p>
@@ -125,11 +128,11 @@ export default function HealthScoreCard({
 
       {/* Divider */}
 
-      <div className="h-px bg-slate-200 my-6" />
+      <div className="h-px bg-slate-200 my-4" />
 
       {/* Quick Stats */}
 
-      <div className="space-y-3">
+      <div className="space-y-2.5">
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
