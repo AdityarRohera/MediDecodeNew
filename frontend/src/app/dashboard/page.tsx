@@ -1,22 +1,30 @@
 import { getCurrentUser } from "@/services/operations/user/auth";
-import { cookies } from 'next/headers';
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-export default async function page() {
+export default async function Page() {
+  try {
+    const cookieStore = await cookies();
 
-  const cookieStore = await cookies();
+    const user = await getCurrentUser(cookieStore.toString());
 
-  const user = await getCurrentUser(cookieStore);
+    if (!user) {
+      redirect("/auth/login");
+    }
 
-  console.log("Geting user details -> " , user);
+    return (
+      <div>
+        Welcome {user.name}
+      </div>
+    );
 
-  if(!user){
-    redirect('/auth/login');
+  } catch (error) {
+    console.error("Dashboard error:", error);
+
+    return (
+      <div>
+        Something went wrong. Please try again.
+      </div>
+    );
   }
-  
-  return (
-    <div>
-      welcome to dashbaod
-    </div>
-  )
 }

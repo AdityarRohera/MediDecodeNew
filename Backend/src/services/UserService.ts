@@ -33,8 +33,11 @@ export const signupService = async ({
         // CHECK USER EXISTS
         const existingUser = await User.getUserByEmailQuery(email);
 
-        if (existingUser.rows.length > 0) {
-            throw new Error("User already exists");
+         if (existingUser.rows.length > 0) {
+            throw {
+                code: "USER_ALREADY_EXISTS",
+                message: "User already exists"
+            };
         }
 
         // HASH PASSWORD

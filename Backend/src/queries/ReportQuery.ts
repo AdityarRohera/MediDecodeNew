@@ -259,7 +259,7 @@ export const getAllReports = async (
     values.push(`%${filter.status.trim()}%`);
 
     conditions.push(
-      `"status" ILIKE $${values.length}`
+      `"STATUS" ILIKE $${values.length}`
     );
 
   }

@@ -33,37 +33,35 @@ export const signup = async(req : Request , res : Response) => {
         });
 
 
-    } catch(err : unknown){
-        console.log("Error comes in signup" , err);
+    } catch (err: unknown) {
 
-        let errorMessage;
+        console.log("Error comes in signup", err);
 
-        if(err instanceof Error){
-            
-             // USER ALREADY EXISTS
-            if (err.message === "User already exists"){
+        if (
+            typeof err === "object" &&
+            err !== null &&
+            "code" in err
+        ) {
+
+            const error = err as {
+                code: string;
+                message: string;
+            };
+
+            if (error.code === "USER_ALREADY_EXISTS") {
                 return res.status(409).json({
                     success: false,
-                    message: err.message
+                    message: error.message
                 });
             }
-
-            errorMessage = err.message
-
-        }else if(typeof err === "string"){
-            errorMessage = err;
-
-        } else{
-            errorMessage = err;
         }
 
         return res.status(500).json({
-            success : false,
-            message : "Internal server Error",
-            error : errorMessage
-        })
+            success: false,
+            message: "Internal server error"
+        });
     }
-}
+};
 
 export const login = async (
     req: Request,

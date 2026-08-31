@@ -28,8 +28,10 @@ app.use(cookieParser());
 // import routes here
 import UserRoute from './routes/UserRoute';
 import ReportRoute from './routes/ReportRoute';
+import ChatbotRoute from './routes/ChatbotRoute';
 app.use('/api/v1/user' , UserRoute);
 app.use('/api/v1/reports' , ReportRoute);
+app.use('/api/v1' , ChatbotRoute)
 
 
 

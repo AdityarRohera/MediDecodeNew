@@ -106,7 +106,7 @@ function CompleteAnalysisUi({response} : any) {
 
                     </div>
 
-        <ChatbotWidget />
+        <ChatbotWidget reportId={response["REPORT_ID"]}/>
 
     </div>
   )

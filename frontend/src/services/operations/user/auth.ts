@@ -80,30 +80,58 @@ export const logout = async() => {
     }
 }
 
-export const getCurrentUser = async(cookieStored? : any) => {
+// export const getCurrentUser = async(cookieStored? : any) => {
 
-    console.log("-------Inside gettinguser service ---------");
+//     console.log("-------Inside gettinguser service ---------");
 
-    try{
+//     try{
 
-        const response = await axios.get(`${BASE_URL}${AUTH_ENDPOINTS.ME}` , 
-            cookieStored ? {headers : {cookie: cookieStored.toString()}} : {withCredentials : true}
-        );
+//         const response = await axios.get(`${BASE_URL}${AUTH_ENDPOINTS.ME}` , 
+//             cookieStored ? {headers : {cookie: cookieStored.toString()}} : {withCredentials : true}
+//         );
 
-        return response.data;
+//         return response.data;
 
-    } catch(err: any){
+//     } catch(err: any){
 
-        console.log("Getting error in fetching user -----> " , err);
+//         console.log("Getting error in fetching user -----> " , err);
 
-        // Unauthorized / No user
-        if (err?.response?.status === 401) {
-            return null;
-        }
+//         // Unauthorized / No user
+//         if (err?.response?.status === 401) {
+//             return null;
+//         }
 
-        throw new Error(
-            err?.response?.data?.message ||
-            "Failed to fetch user"
-        )
+//         throw new Error(
+//             err?.response?.data?.message ||
+//             "Failed to fetch user"
+//         )
+//     }
+// }
+
+export const getCurrentUser = async (cookie?: string) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}${AUTH_ENDPOINTS.ME}`,
+      {
+        headers: cookie
+          ? {
+              Cookie: cookie,
+            }
+          : undefined,
+        withCredentials: true,
+      }
+    );
+
+    return response.data;
+  } catch (err: any) {
+    console.log("Getting user error --->", err);
+
+    if (err?.response?.status === 401) {
+      return null;
     }
-}
+
+    throw new Error(
+      err?.response?.data?.message || "Failed to fetch user"
+    );
+  }
+};

@@ -1,60 +1,106 @@
-import { GitCompare, FileText, TrendingUp } from "lucide-react";
-import Link from "next/link";
+import { cookies } from "next/headers";
+import { FileText } from "lucide-react";
 
-export default function AnalysisPage() {
+import { fetchAllreports } from "@/services/operations/reports/report";
+import { getOrganMatrix } from "@/data/analysisData";
+
+import ScoreTrend from "@/components/analysis/ScoreTrend";
+import OrganMatrix from "@/components/analysis/OrganMatrix";
+import ComparableGroups, {
+  ComparableGroup,
+} from "@/components/analysis/ComparableGroups";
+import ChangeSinceLast from "@/components/analysis/ChangeSinceLast";
+import { normalizeType } from "@/components/analysis/shared";
+import EmptyState from "@/components/analysis/EmptyState";
+
+export default async function AnalysisOverviewPage() {
+  const cookieStore = await cookies();
+
+  let reports: any[] = [];
+
+  try {
+    const res = await fetchAllreports({status : 'COMPLETED'} , cookieStore);
+
+    reports = res.data ?? [];
+  } catch (err) {
+    console.log("-------Error comes in analysis overview-------", err);
+  }
+
+  // Oldest first, so the trend reads left to right.
+  const analyzed = reports
+    .filter((report: any) => report.STATUS === "COMPLETED")
+    .sort(
+      (a: any, b: any) =>
+        new Date(a.UPLOADED_DATE).getTime() -
+        new Date(b.UPLOADED_DATE).getTime()
+    );
+
+  if (analyzed.length < 2) {
+    return (
+      <EmptyState
+        icon={FileText}
+        title="Not enough reports yet"
+        message="You need at least two analyzed reports before we can show a trend. Upload one more to get started."
+        actionLabel="Upload report"
+        actionHref="/dashboard/upload"
+      />
+    );
+  }
+
+  const points = analyzed.map((report: any) => ({
+    reportId: report.REPORT_ID,
+    score: report.HEALTH_SCORE ?? 0,
+    date: report.UPLOADED_DATE,
+  }));
+
+  const previous = analyzed[analyzed.length - 2];
+  const latest = analyzed[analyzed.length - 1];
+
+  const diff = (key: string) =>
+    (latest[key] ?? 0) - (previous[key] ?? 0);
+
+  // Group by report type so we know which reports can be compared.
+  const groups: ComparableGroup[] = Object.values(
+    analyzed.reduce((acc: any, report: any) => {
+      const type = normalizeType(report.REPORT_TYPE);
+
+      if (!acc[type]) {
+        acc[type] = { reportType: type, count: 0, latestTwo: [] };
+      }
+
+      acc[type].count += 1;
+
+      // Newest two ids, oldest of the pair first.
+      acc[type].latestTwo = [
+        ...acc[type].latestTwo,
+        report.REPORT_ID,
+      ].slice(-2);
+
+      return acc;
+    }, {})
+  );
+
+  const matrix = getOrganMatrix();
+
   return (
-    <div className="px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl space-y-6">
+    <div className="space-y-5">
+      <ScoreTrend points={points} />
 
-        {/* Header */}
-        <div className="max-w-2xl">
-          <span className="inline-flex rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-cyan-700">
-            Analysis
-          </span>
+      <div className="grid gap-5 lg:grid-cols-2">
+        <OrganMatrix
+          columns={matrix.columns}
+          rows={matrix.rows}
+        />
 
-          <h1 className="mt-4 text-3xl font-bold text-slate-950 sm:text-4xl">
-            Compare Reports
-          </h1>
+        <div className="space-y-5">
+          <ChangeSinceLast
+            normal={diff("NORMAL_TESTS")}
+            borderline={diff("BORDERLINE_TESTS")}
+            critical={diff("CRITICAL_TESTS")}
+          />
 
-          <p className="mt-2 text-slate-500">
-            Compare two of your lab reports side by side to see how your health
-            markers have changed over time.
-          </p>
+          <ComparableGroups groups={groups} />
         </div>
-
-        {/* Empty state */}
-        <section className="rounded-lg border border-slate-200 bg-white p-10 text-center shadow-sm sm:p-16">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-cyan-500 to-blue-600 shadow-md shadow-blue-900/10">
-            <GitCompare className="h-8 w-8 text-white" />
-          </div>
-
-          <h2 className="mt-5 text-xl font-semibold text-slate-900">
-            Select reports to compare
-          </h2>
-
-          <p className="mx-auto mt-2 max-w-md text-slate-500">
-            Upload at least two reports and pick them from your reports list to
-            start a comparison.
-          </p>
-
-          <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/dashboard/reports"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-cyan-600 px-5 text-sm font-semibold text-white shadow-sm shadow-cyan-900/10 transition hover:bg-cyan-700 focus:outline-none focus:ring-4 focus:ring-cyan-100"
-            >
-              <FileText size={18} />
-              Browse Reports
-            </Link>
-
-            <Link
-              href="/dashboard/upload"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              <TrendingUp size={18} />
-              Upload New Report
-            </Link>
-          </div>
-        </section>
       </div>
     </div>
   );

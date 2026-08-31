@@ -17,4 +17,9 @@ export const REPORT_ENDPOINTS = {
     ALL_REPORTS : '/reports'
 }
 
+export const CHAT_ENDPOINTS = {
+    GET_CHAT: "/reports",
+    SEND_MESSAGE: "/chats",
+};
+
 export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
