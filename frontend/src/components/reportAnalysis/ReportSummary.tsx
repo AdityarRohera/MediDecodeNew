@@ -1,8 +1,4 @@
-import {
-  ClipboardList,
-  Stethoscope,
-  TriangleAlert,
-} from "lucide-react";
+import { ClipboardList, Stethoscope, TriangleAlert } from "lucide-react";
 
 type Props = {
   reportSummary: string;
@@ -12,9 +8,15 @@ type Props = {
 };
 
 const recommendationLabels: Record<string, string> = {
-  NOT_REQUIRED: "No Consultation Needed",
-  CONSIDER_VISIT: "Consider a Doctor Visit",
-  RECOMMENDED: "Doctor Visit Recommended",
+  NOT_REQUIRED: "No consultation needed",
+  CONSIDER_VISIT: "Consider a doctor visit",
+  RECOMMENDED: "Doctor visit recommended",
+};
+
+const recommendationTone: Record<string, string> = {
+  NOT_REQUIRED: "border-emerald-100 bg-emerald-50 text-emerald-800",
+  CONSIDER_VISIT: "border-amber-100 bg-amber-50 text-amber-800",
+  RECOMMENDED: "border-red-100 bg-red-50 text-red-800",
 };
 
 export default function ReportSummaryCard({
@@ -23,112 +25,76 @@ export default function ReportSummaryCard({
   criticalTests,
   borderlineTests,
 }: Props) {
-  return (
-    <div
-      className="
-      bg-white
-      rounded-2xl
-      border border-slate-200
-      p-5
-      shadow-sm
-      "
-    >
-      {/* Header */}
+  const tone =
+    recommendationTone[doctorRecommendation] ||
+    "border-slate-200 bg-slate-50 text-slate-800";
 
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
       <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center">
-          <ClipboardList className="h-5 w-5 text-blue-600" />
-        </div>
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50">
+          <ClipboardList className="h-5 w-5 text-brand-600" />
+        </span>
 
         <div>
-          <h2 className="text-base font-semibold text-slate-900">
-            Report Summary
+          <h2 className="text-sm font-semibold text-slate-900">
+            Report summary
           </h2>
 
-          <p className="text-sm text-slate-500">
-            AI generated analysis
-          </p>
+          <p className="text-xs text-slate-500">AI generated analysis</p>
         </div>
       </div>
 
-      {/* Findings */}
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <div className="rounded-xl border border-red-100 bg-red-50 p-3">
+          <p className="text-xs font-medium text-red-600">Critical findings</p>
 
-      <div className="grid grid-cols-2 gap-3 mt-4">
-
-        <div className="rounded-xl bg-red-50 border border-red-100 p-3">
-          <p className="text-red-600 text-xs font-medium">
-            Critical Findings
+          <p className="mt-0.5 text-2xl font-semibold text-red-700">
+            {criticalTests ?? 0}
           </p>
-
-          <h3 className="text-2xl font-bold text-red-700 mt-0.5">
-            {criticalTests}
-          </h3>
         </div>
 
-        <div className="rounded-xl bg-amber-50 border border-amber-100 p-3">
-          <p className="text-amber-600 text-xs font-medium">
-            Borderline Findings
+        <div className="rounded-xl border border-amber-100 bg-amber-50 p-3">
+          <p className="text-xs font-medium text-amber-600">
+            Borderline findings
           </p>
 
-          <h3 className="text-2xl font-bold text-amber-700 mt-0.5">
-            {borderlineTests}
-          </h3>
+          <p className="mt-0.5 text-2xl font-semibold text-amber-700">
+            {borderlineTests ?? 0}
+          </p>
         </div>
-
       </div>
-
-      {/* Summary */}
 
       <div className="mt-5">
-        <div className="flex items-center gap-2 mb-2">
-          <Stethoscope className="h-4 w-4 text-slate-600" />
+        <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+          <Stethoscope className="h-4 w-4 text-slate-500" />
+          What this report says
+        </h3>
 
-          <h3 className="text-sm font-semibold text-slate-900">
-            AI Analysis
-          </h3>
-        </div>
-
-        <p className="text-slate-600 leading-6 text-sm">
+        <p className="mt-2 text-sm leading-relaxed text-slate-600">
           {reportSummary}
         </p>
       </div>
 
-      {/* Recommendation */}
-
-      <div
-        className="
-        mt-5
-        rounded-xl
-        border
-        border-amber-200
-        bg-gradient-to-r
-        from-amber-50
-        to-orange-50
-        p-4
-        "
-      >
+      <div className={`mt-5 rounded-xl border p-4 ${tone}`}>
         <div className="flex items-start gap-3">
-
-          <div className="mt-0.5">
-            <TriangleAlert className="h-4 w-4 text-amber-600" />
-          </div>
+          <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
 
           <div>
-            <p className="text-xs uppercase tracking-wider text-amber-700 font-semibold">
-              Doctor Recommendation
+            <p className="text-xs font-semibold uppercase tracking-wider opacity-80">
+              Doctor recommendation
             </p>
 
-            <h3 className="mt-1 text-base font-bold text-amber-800">
-              {recommendationLabels[doctorRecommendation] || doctorRecommendation}
+            <h3 className="mt-1 text-sm font-bold">
+              {recommendationLabels[doctorRecommendation] ||
+                doctorRecommendation}
             </h3>
 
-            <p className="mt-1.5 text-xs text-slate-700 leading-5">
-              Based on the abnormalities detected in this
-              report, consultation with a healthcare
-              professional is advised.
+            <p className="mt-1.5 text-xs leading-relaxed opacity-90">
+              This summary is educational. Confirm anything that matters with a
+              qualified healthcare professional.
             </p>
           </div>
-
         </div>
       </div>
     </div>

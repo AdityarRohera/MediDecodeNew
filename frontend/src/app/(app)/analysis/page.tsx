@@ -11,7 +11,7 @@ import ComparableGroups, {
 } from "@/components/analysis/ComparableGroups";
 import ChangeSinceLast from "@/components/analysis/ChangeSinceLast";
 import { normalizeType } from "@/components/analysis/shared";
-import EmptyState from "@/components/analysis/EmptyState";
+import EmptyState from "@/components/common/EmptyState";
 
 export default async function AnalysisOverviewPage() {
   const cookieStore = await cookies();
@@ -42,7 +42,7 @@ export default async function AnalysisOverviewPage() {
         title="Not enough reports yet"
         message="You need at least two analyzed reports before we can show a trend. Upload one more to get started."
         actionLabel="Upload report"
-        actionHref="/dashboard/upload"
+        actionHref="/upload"
       />
     );
   }
@@ -83,16 +83,16 @@ export default async function AnalysisOverviewPage() {
   const matrix = getOrganMatrix();
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <ScoreTrend points={points} />
 
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <OrganMatrix
           columns={matrix.columns}
           rows={matrix.rows}
         />
 
-        <div className="space-y-5">
+        <div className="space-y-4">
           <ChangeSinceLast
             normal={diff("NORMAL_TESTS")}
             borderline={diff("BORDERLINE_TESTS")}

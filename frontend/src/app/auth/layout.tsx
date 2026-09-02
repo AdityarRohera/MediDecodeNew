@@ -3,13 +3,5 @@ export default function AuthLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className="min-h-full flex flex-col">
-      <div>
-        This is nav bar for authentication
-      </div>
-
-      {children}
-    </div>
-  );
+  return <div className="min-h-screen bg-white">{children}</div>;
 }

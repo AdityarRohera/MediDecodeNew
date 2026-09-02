@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, TriangleAlert } from "lucide-react";
+
 import { analyseReport } from "@/services/operations/reports/report";
+import StatusShell from "./StatusShell";
 
 export default function UploadedState({
   reportId,
@@ -12,6 +14,8 @@ export default function UploadedState({
 }) {
 
   const router = useRouter();
+
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
 
@@ -25,6 +29,8 @@ export default function UploadedState({
 
       } catch (error) {
         console.log("Error starting analysis ----> ", error);
+
+        setFailed(true);
       }
     };
 
@@ -32,25 +38,30 @@ export default function UploadedState({
 
   }, [reportId]);
 
+  if (failed) {
+    return (
+      <StatusShell
+        icon={TriangleAlert}
+        tone="danger"
+        title="We could not start the analysis"
+        message="The report was uploaded, but the analysis did not start. Refresh the page to try again."
+      >
+        <button
+          onClick={() => router.refresh()}
+          className="mt-6 inline-flex h-11 items-center justify-center rounded-xl bg-brand-600 px-5 text-sm font-semibold text-white transition hover:bg-brand-700"
+        >
+          Retry
+        </button>
+      </StatusShell>
+    );
+  }
+
   return (
-    <div className="flex min-h-[70vh] items-center justify-center px-4">
-
-      <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-sm">
-
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-cyan-500 to-blue-600 shadow-md shadow-blue-900/10">
-          <Loader2 className="h-8 w-8 animate-spin text-white" />
-        </div>
-
-        <h1 className="mt-6 text-xl font-semibold text-slate-900">
-          Starting Analysis
-        </h1>
-
-        <p className="mt-2 text-slate-500">
-          Preparing your report for AI analysis...
-        </p>
-
-      </div>
-
-    </div>
+    <StatusShell
+      icon={Loader2}
+      spinning
+      title="Starting analysis"
+      message="Preparing your report for the AI. Hang tight, this only takes a moment."
+    />
   );
 }

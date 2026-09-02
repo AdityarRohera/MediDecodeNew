@@ -2,46 +2,41 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { GitCompare, History, TrendingUp } from "lucide-react";
 
 const tabs = [
-  { label: "Overview", href: "/dashboard/analysis" },
-  { label: "Compare", href: "/dashboard/analysis/compare" },
-  { label: "History", href: "/dashboard/analysis/history" },
+  { label: "Overview", href: "/analysis", icon: TrendingUp },
+  { label: "Compare", href: "/analysis/compare", icon: GitCompare },
+  { label: "History", href: "/analysis/history", icon: History },
 ];
 
 export default function AnalysisTabs() {
   const pathname = usePathname();
 
   const isActive = (href: string) =>
-    href === "/dashboard/analysis"
-      ? pathname === href
-      : pathname.startsWith(href);
+    href === "/analysis" ? pathname === href : pathname.startsWith(href);
 
   return (
-    <div className="border-b border-slate-200">
-      <div className="flex gap-8">
-        {tabs.map((tab) => {
-          const active = isActive(tab.href);
+    <nav className="inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
+      {tabs.map((tab) => {
+        const Icon = tab.icon;
+        const active = isActive(tab.href);
 
-          return (
-            <Link
-              key={tab.href}
-              href={tab.href}
-              className={`relative py-3 text-sm font-medium transition-colors ${
-                active
-                  ? "text-cyan-700"
-                  : "text-slate-500 hover:text-slate-900"
-              }`}
-            >
-              {tab.label}
-
-              {active && (
-                <span className="absolute bottom-0 left-0 h-[2.5px] w-full rounded-full bg-cyan-600" />
-              )}
-            </Link>
-          );
-        })}
-      </div>
-    </div>
+        return (
+          <Link
+            key={tab.href}
+            href={tab.href}
+            className={`flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition ${
+              active
+                ? "bg-brand-600 text-white shadow-sm"
+                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+            }`}
+          >
+            <Icon size={16} />
+            {tab.label}
+          </Link>
+        );
+      })}
+    </nav>
   );
 }

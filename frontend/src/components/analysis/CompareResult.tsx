@@ -1,12 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import {
-  Loader2,
-  RotateCw,
-  Sparkles,
-  TriangleAlert,
-} from "lucide-react";
+import { Loader2, RotateCw, Sparkles, TriangleAlert } from "lucide-react";
 
 import {
   createComparison,
@@ -51,9 +46,7 @@ export default function CompareResult({
   const requested = useRef("");
 
   useEffect(() => {
-    const key =
-      comparisonId ||
-      `${reportA.reportId}-${reportB.reportId}`;
+    const key = comparisonId || `${reportA.reportId}-${reportB.reportId}`;
 
     if (requested.current === key) return;
 
@@ -66,10 +59,7 @@ export default function CompareResult({
       try {
         const res = comparisonId
           ? await fetchComparison(comparisonId)
-          : await createComparison(
-              reportA.reportId,
-              reportB.reportId
-            );
+          : await createComparison(reportA.reportId, reportB.reportId);
 
         const row = res.data;
 
@@ -98,29 +88,38 @@ export default function CompareResult({
 
   if (loading) {
     return (
-      <section className="rounded-xl border border-slate-200 bg-white p-10 text-center">
-        <Loader2 className="mx-auto h-7 w-7 animate-spin text-cyan-600" />
+      <section className="animate-fade-up rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-card">
+        <span className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50">
+          <span className="absolute inset-0 animate-pulse-ring rounded-2xl bg-brand-200" />
+          <Loader2 className="relative h-7 w-7 animate-spin text-brand-600" />
+        </span>
 
-        <h2 className="mt-4 text-lg font-semibold text-slate-900">
+        <h2 className="mt-4 text-base font-semibold text-slate-900">
           Comparing your reports
         </h2>
 
         <p className="mx-auto mt-1.5 max-w-md text-sm text-slate-500">
-          We are lining up every test across both reports. This
-          takes a few seconds the first time.
+          We are lining up every test across both reports. This takes a few
+          seconds the first time.
         </p>
+
+        <div className="mx-auto mt-6 grid max-w-2xl gap-3 sm:grid-cols-5">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div key={index} className="skeleton h-16" />
+          ))}
+        </div>
       </section>
     );
   }
 
   if (error) {
     return (
-      <section className="rounded-xl border border-slate-200 bg-white p-10 text-center">
+      <section className="animate-fade-up rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-card">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50">
           <TriangleAlert className="h-7 w-7 text-red-500" />
         </div>
 
-        <h2 className="mt-4 text-lg font-semibold text-slate-900">
+        <h2 className="mt-4 text-base font-semibold text-slate-900">
           Comparison failed
         </h2>
 
@@ -130,7 +129,7 @@ export default function CompareResult({
 
         <button
           onClick={retry}
-          className="mt-6 inline-flex h-10 items-center gap-2 rounded-lg bg-cyan-600 px-5 text-sm font-semibold text-white transition hover:bg-cyan-700"
+          className="mt-6 inline-flex h-11 items-center gap-2 rounded-xl bg-brand-600 px-5 text-sm font-semibold text-white shadow-sm shadow-brand-900/20 transition hover:bg-brand-700"
         >
           <RotateCw size={16} />
           Try again
@@ -142,22 +141,20 @@ export default function CompareResult({
   if (!view) return null;
 
   const daysApart = Math.round(
-    (new Date(reportB.date).getTime() -
-      new Date(reportA.date).getTime()) /
-      DAY
+    (new Date(reportB.date).getTime() - new Date(reportA.date).getTime()) / DAY
   );
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <CompareHeader
         reportA={reportA}
         reportB={reportB}
         daysApart={daysApart}
       />
 
-      <section className="rounded-xl border border-cyan-100 bg-cyan-50/60 p-5">
+      <section className="animate-fade-up rounded-2xl border border-brand-100 bg-brand-50/60 p-5">
         <div className="flex items-start gap-3">
-          <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-cyan-600" />
+          <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-brand-600" />
 
           <div className="flex-1">
             <div className="flex flex-wrap items-center justify-between gap-3">

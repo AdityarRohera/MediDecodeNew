@@ -1,20 +1,15 @@
-
-import { redirect } from 'next/navigation';
-import LandingPage from "@/components/LandingPage/LandingPage";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
+import LandingPage from "@/components/LandingPage/LandingPage";
 
 export default async function Home() {
+  const cookieStore = await cookies();
 
-  const cookie = await cookies();
-  const token = cookie.get('token');
-
-  if(token){
-    redirect('/dashboard');
+  // A signed in visitor goes straight to their reports.
+  if (cookieStore.get("token")) {
+    redirect("/reports");
   }
 
-  return(
-    <LandingPage/>
-  )
-
+  return <LandingPage />;
 }

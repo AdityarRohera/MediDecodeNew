@@ -1,26 +1,33 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+
+import StatusShell from "./StatusShell";
 
 export default function ProcessingState() {
 
+  const router = useRouter();
+
+  // The analysis finishes on the server, so the page checks back
+  // instead of leaving the user on a screen that never moves.
+  useEffect(() => {
+    const timer = setInterval(() => router.refresh(), 5000);
+
+    return () => clearInterval(timer);
+  }, [router]);
+
   return (
-    <div className="flex min-h-[70vh] items-center justify-center px-4">
-
-      <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-sm">
-
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-cyan-500 to-blue-600 shadow-md shadow-blue-900/10">
-          <Loader2 className="h-8 w-8 animate-spin text-white" />
-        </div>
-
-        <h1 className="mt-6 text-xl font-semibold text-slate-900">
-          Analyzing Report
-        </h1>
-
-        <p className="mt-2 text-slate-500">
-          Our AI is reviewing your lab results. This usually takes less than a minute.
-        </p>
-
+    <StatusShell
+      icon={Loader2}
+      spinning
+      title="Analyzing your report"
+      message="Our AI is reading every test and grouping the results. This usually takes less than a minute, and the page updates on its own."
+    >
+      <div className="mt-6 h-1.5 overflow-hidden rounded-full bg-slate-100">
+        <div className="h-full w-1/3 animate-[shimmer_1.4s_linear_infinite] rounded-full bg-linear-to-r from-brand-400 via-brand-600 to-brand-400 bg-[length:200%_100%]" />
       </div>
-
-    </div>
+    </StatusShell>
   );
 }

@@ -33,9 +33,80 @@ const changeTone: Record<string, string> = {
   IMPROVED: "border-emerald-100 bg-emerald-50 text-emerald-700",
   WORSENED: "border-red-100 bg-red-50 text-red-700",
   SAME: "border-slate-200 bg-slate-50 text-slate-600",
-  NEW: "border-cyan-100 bg-cyan-50 text-cyan-700",
+  NEW: "border-brand-100 bg-brand-50 text-brand-700",
   REMOVED: "border-slate-200 bg-slate-50 text-slate-600",
 };
+
+const hrefOf = (item: ComparisonHistoryItem) =>
+  `/analysis/compare?a=${item.previous.reportId}&b=${item.current.reportId}&id=${item.comparisonId}`;
+
+const deltaOf = (item: ComparisonHistoryItem) =>
+  (item.current.score ?? 0) - (item.previous.score ?? 0);
+
+const daysApartOf = (item: ComparisonHistoryItem) =>
+  Math.abs(
+    Math.round(
+      (new Date(item.current.date).getTime() -
+        new Date(item.previous.date).getTime()) /
+        DAY
+    )
+  );
+
+function DeltaText({ delta }: { delta: number }) {
+  return (
+    <span
+      className={`text-xs font-semibold ${
+        delta > 0
+          ? "text-emerald-600"
+          : delta < 0
+          ? "text-red-600"
+          : "text-slate-400"
+      }`}
+    >
+      {delta > 0 ? "+" : ""}
+      {delta}
+    </span>
+  );
+}
+
+function StatChips({ stats }: { stats: ComparisonHistoryItem["stats"] }) {
+  const chips = [
+    {
+      value: stats.improved,
+      label: "improved",
+      tone: "bg-emerald-50 text-emerald-700",
+    },
+    {
+      value: stats.worsened,
+      label: "worsened",
+      tone: "bg-red-50 text-red-700",
+    },
+    {
+      value: stats.unchanged,
+      label: "stable",
+      tone: "bg-slate-100 text-slate-600",
+    },
+    { value: stats.newTests, label: "new", tone: "bg-brand-50 text-brand-700" },
+    {
+      value: stats.notRepeated,
+      label: "not redone",
+      tone: "bg-amber-50 text-amber-700",
+    },
+  ].filter((chip) => chip.value > 0);
+
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {chips.map((chip) => (
+        <span
+          key={chip.label}
+          className={`rounded-full px-2 py-0.5 text-xs font-medium ${chip.tone}`}
+        >
+          {chip.value} {chip.label}
+        </span>
+      ))}
+    </div>
+  );
+}
 
 export default function HistoryTable({
   items,
@@ -43,63 +114,52 @@ export default function HistoryTable({
   items: ComparisonHistoryItem[];
 }) {
   return (
-    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[860px]">
+    <section className="animate-fade-up overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
+      {/* Desktop */}
+      <div className="scrollbar-slim hidden overflow-x-auto lg:block">
+        <table className="w-full min-w-[880px]">
           <thead className="bg-slate-50">
             <tr className="border-b border-slate-200">
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Reports compared
-              </th>
-
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Period
-              </th>
-
-              <th className="px-5 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Health score
-              </th>
-
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Outcome
-              </th>
-
-              <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Compared on
-              </th>
-
-              <th className="px-5 py-3" />
+              {[
+                "Reports compared",
+                "Period",
+                "Health score",
+                "Outcome",
+                "Compared on",
+                "",
+              ].map((heading, index) => (
+                <th
+                  key={index}
+                  className={`px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 ${
+                    index === 2
+                      ? "text-center"
+                      : index >= 4
+                      ? "text-right"
+                      : "text-left"
+                  }`}
+                >
+                  {heading}
+                </th>
+              ))}
             </tr>
           </thead>
 
           <tbody className="divide-y divide-slate-100">
             {items.map((item) => {
               const change = toChange(item.overallChange);
-
-              const scoreA = item.previous.score ?? 0;
-              const scoreB = item.current.score ?? 0;
-              const delta = scoreB - scoreA;
-
-              const daysApart = Math.abs(
-                Math.round(
-                  (new Date(item.current.date).getTime() -
-                    new Date(item.previous.date).getTime()) /
-                    DAY
-                )
-              );
-
-              const href = `/dashboard/analysis/compare?a=${item.previous.reportId}&b=${item.current.reportId}&id=${item.comparisonId}`;
+              const delta = deltaOf(item);
+              const daysApart = daysApartOf(item);
 
               return (
                 <tr
                   key={item.comparisonId}
-                  className="align-top transition hover:bg-cyan-50/40"
+                  className="align-top transition hover:bg-brand-50/40"
                 >
                   <td className="px-5 py-4">
                     <div className="flex gap-3">
-                      <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-50">
-                        <FileText className="h-4.5 w-4.5 text-cyan-600" />
-                      </div>
+                      <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-50">
+                        <FileText className="h-4 w-4 text-brand-600" />
+                      </span>
 
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-slate-900">
@@ -131,25 +191,16 @@ export default function HistoryTable({
 
                   <td className="px-5 py-4 text-center">
                     <div className="flex items-center justify-center gap-2 text-sm text-slate-600">
-                      {scoreA}
+                      {item.previous.score ?? 0}
                       <ArrowRight size={14} className="text-slate-300" />
                       <span className="font-semibold text-slate-900">
-                        {scoreB}
+                        {item.current.score ?? 0}
                       </span>
                     </div>
 
-                    <p
-                      className={`mt-1 text-xs font-semibold ${
-                        delta > 0
-                          ? "text-emerald-600"
-                          : delta < 0
-                          ? "text-red-600"
-                          : "text-slate-400"
-                      }`}
-                    >
-                      {delta > 0 ? "+" : ""}
-                      {delta}
-                    </p>
+                    <div className="mt-1">
+                      <DeltaText delta={delta} />
+                    </div>
                   </td>
 
                   <td className="px-5 py-4">
@@ -159,36 +210,8 @@ export default function HistoryTable({
                       {changeStyle[change].label}
                     </span>
 
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {item.stats.improved > 0 && (
-                        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
-                          {item.stats.improved} improved
-                        </span>
-                      )}
-
-                      {item.stats.worsened > 0 && (
-                        <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700">
-                          {item.stats.worsened} worsened
-                        </span>
-                      )}
-
-                      {item.stats.unchanged > 0 && (
-                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                          {item.stats.unchanged} stable
-                        </span>
-                      )}
-
-                      {item.stats.newTests > 0 && (
-                        <span className="rounded-full bg-cyan-50 px-2 py-0.5 text-xs font-medium text-cyan-700">
-                          {item.stats.newTests} new
-                        </span>
-                      )}
-
-                      {item.stats.notRepeated > 0 && (
-                        <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
-                          {item.stats.notRepeated} not redone
-                        </span>
-                      )}
+                    <div className="mt-2">
+                      <StatChips stats={item.stats} />
                     </div>
                   </td>
 
@@ -198,11 +221,11 @@ export default function HistoryTable({
 
                   <td className="px-5 py-4 text-right">
                     <Link
-                      href={href}
+                      href={hrefOf(item)}
                       title="Open comparison"
-                      className="inline-flex rounded-lg border border-slate-200 p-2.5 transition hover:border-cyan-500 hover:bg-cyan-50"
+                      className="inline-flex rounded-lg border border-slate-200 p-2.5 transition hover:border-brand-400 hover:bg-brand-50"
                     >
-                      <Eye size={18} className="text-cyan-600" />
+                      <Eye size={17} className="text-brand-600" />
                     </Link>
                   </td>
                 </tr>
@@ -210,6 +233,60 @@ export default function HistoryTable({
             })}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile */}
+      <div className="divide-y divide-slate-100 lg:hidden">
+        {items.map((item) => {
+          const change = toChange(item.overallChange);
+
+          return (
+            <Link
+              key={item.comparisonId}
+              href={hrefOf(item)}
+              className="block p-4 transition hover:bg-brand-50/40"
+            >
+              <div className="flex items-start gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-50">
+                  <FileText className="h-4 w-4 text-brand-600" />
+                </span>
+
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-slate-900">
+                    {item.current.reportName || "Untitled report"}
+                  </p>
+
+                  <p className="truncate text-xs text-slate-500">
+                    vs {item.previous.reportName || "Untitled report"}
+                  </p>
+                </div>
+
+                <span
+                  className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-semibold ${changeTone[change]}`}
+                >
+                  {changeStyle[change].label}
+                </span>
+              </div>
+
+              <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
+                {item.previous.score ?? 0}
+                <ArrowRight size={14} className="text-slate-300" />
+                <span className="font-semibold text-slate-900">
+                  {item.current.score ?? 0}
+                </span>
+                <DeltaText delta={deltaOf(item)} />
+
+                <span className="ml-auto text-xs text-slate-400">
+                  {formatDate(item.comparedAt)}
+                </span>
+              </div>
+
+              <div className="mt-2.5">
+                <StatChips stats={item.stats} />
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

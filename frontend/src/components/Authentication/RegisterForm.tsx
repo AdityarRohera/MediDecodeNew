@@ -1,178 +1,276 @@
+"use client";
 
-"use client"
-import { register } from '@/services/operations/user/auth';
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  Eye,
+  EyeOff,
+  Loader2,
+  Lock,
+  Mail,
+  TriangleAlert,
+  User,
+} from "lucide-react";
 
-function RegisterForm() {
+import { register, signin } from "@/services/operations/user/auth";
+import { useAuth } from "@/context/AuthContext";
+import { inputClass } from "./LoginForm";
 
-    const router = useRouter();
+export default function RegisterForm() {
+  const router = useRouter();
+  const { fetchUser } = useAuth();
 
-    const[formData , setFormData] = useState({name : "" , email : "" , password : "" , confirmPassword : ""});
-    const [loading , setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-    const changeHandler = (e : any) => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [accepted, setAccepted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-        const {name , value} = e.target;
+  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
 
-        setFormData((prev : any) => {
-            return {
-                ...prev,
-                [name] : value
-            }
-        })
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setError("");
+  };
+
+  const validate = () => {
+    if (!formData.name.trim()) return "Please enter your full name.";
+    if (!formData.email.trim()) return "Please enter your email address.";
+    if (formData.password.length < 6)
+      return "Password must be at least 6 characters.";
+    if (formData.password !== formData.confirmPassword)
+      return "Passwords do not match.";
+    if (!accepted) return "Please accept the terms to continue.";
+
+    return "";
+  };
+
+  const submitHandler = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const message = validate();
+
+    if (message) {
+      setError(message);
+      return;
     }
 
-    const submitHandler = async() => {
-        try{
+    try {
+      setLoading(true);
+      setError("");
 
-            setLoading(true);
+      const { confirmPassword, ...dataToSend } = formData;
 
-            // validation
-            if(formData.password !== formData.confirmPassword) alert("Password not match with confirm password")
+      await register(dataToSend);
 
-            const { confirmPassword, ...dataToSend } = formData;
-            const res = await register(dataToSend);
+      /*
+          Signing in right away keeps the new user in one flow
+          instead of bouncing them back to the login screen.
+      */
+      try {
+        await signin({
+          email: formData.email,
+          password: formData.password,
+        });
 
-            // toast message
+        await fetchUser();
 
-            // redirect
-            router.push('/auth/login');
+        router.push("/reports?welcome=1");
+        router.refresh();
+      } catch {
+        router.push("/auth/login");
+      }
+    } catch (err: any) {
+      console.log("Error comes in RegisterForm Submit Handler", err);
 
-        } catch(err) {
-            console.log("Error comes in RegisterForm Submit Handler" , err);
-
-        } finally{
-            setLoading(false);
-        }
+      setError(
+        err?.message || "We could not create your account. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
-
+  };
 
   return (
-  <div className="space-y-6">
+    <form onSubmit={submitHandler} className="space-y-4">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+          Create your account
+        </h1>
 
-    <div>
-      <h2 className="text-5xl font-bold text-slate-900">
-        Sign Up
-      </h2>
+        <p className="mt-1.5 text-sm text-slate-500">
+          Free to start. No card required.
+        </p>
+      </div>
 
-      <p className="mt-2 text-slate-500">
-        Create your account to get started
-      </p>
-    </div>
+      {error && (
+        <div className="flex animate-fade-down items-start gap-2.5 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-700">
+          <TriangleAlert size={17} className="mt-0.5 shrink-0" />
+          {error}
+        </div>
+      )}
 
-    <div>
+      <div>
+        <label
+          htmlFor="name"
+          className="mb-1.5 block text-sm font-medium text-slate-700"
+        >
+          Full name
+        </label>
 
-      <label className="block mb-2 text-sm font-semibold text-slate-700">
-        Full Name
-      </label>
+        <div className="relative">
+          <User
+            size={17}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+          />
 
-      <input
-        type="text"
-        name="name"
-        value={formData.name}
-        onChange={changeHandler}
-        placeholder="Enter your full name"
-        className="w-full rounded-xl border border-slate-200 px-4 py-4 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition"
-      />
+          <input
+            id="name"
+            type="text"
+            name="name"
+            autoComplete="name"
+            value={formData.name}
+            onChange={changeHandler}
+            placeholder="Your name"
+            className={inputClass}
+          />
+        </div>
+      </div>
 
-    </div>
+      <div>
+        <label
+          htmlFor="email"
+          className="mb-1.5 block text-sm font-medium text-slate-700"
+        >
+          Email address
+        </label>
 
-    <div>
+        <div className="relative">
+          <Mail
+            size={17}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+          />
 
-      <label className="block mb-2 text-sm font-semibold text-slate-700">
-        Email Address
-      </label>
+          <input
+            id="email"
+            type="email"
+            name="email"
+            autoComplete="email"
+            value={formData.email}
+            onChange={changeHandler}
+            placeholder="you@example.com"
+            className={inputClass}
+          />
+        </div>
+      </div>
 
-      <input
-        type="email"
-        name="email"
-        value={formData.email}
-        onChange={changeHandler}
-        placeholder="Enter your email address"
-        className="w-full rounded-xl border border-slate-200 px-4 py-4 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition"
-      />
+      <div className="space-y-4">
+        <div>
+          <label
+            htmlFor="password"
+            className="mb-1.5 block text-sm font-medium text-slate-700"
+          >
+            Password
+          </label>
 
-    </div>
+          <div className="relative">
+            <Lock
+              size={17}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+            />
 
-    <div>
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              autoComplete="new-password"
+              value={formData.password}
+              onChange={changeHandler}
+              placeholder="Min. 6 characters"
+              className={inputClass}
+            />
 
-      <label className="block mb-2 text-sm font-semibold text-slate-700">
-        Password
-      </label>
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+            >
+              {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+            </button>
+          </div>
+        </div>
 
-      <input
-        type="password"
-        name="password"
-        value={formData.password}
-        onChange={changeHandler}
-        placeholder="Create a password"
-        className="w-full rounded-xl border border-slate-200 px-4 py-4 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition"
-      />
+        <div>
+          <label
+            htmlFor="confirmPassword"
+            className="mb-1.5 block text-sm font-medium text-slate-700"
+          >
+            Confirm password
+          </label>
 
-    </div>
+          <div className="relative">
+            <Lock
+              size={17}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+            />
 
-    <div>
+            <input
+              id="confirmPassword"
+              type={showPassword ? "text" : "password"}
+              name="confirmPassword"
+              autoComplete="new-password"
+              value={formData.confirmPassword}
+              onChange={changeHandler}
+              placeholder="Repeat password"
+              className={inputClass}
+            />
+          </div>
+        </div>
+      </div>
 
-      <label className="block mb-2 text-sm font-semibold text-slate-700">
-        Confirm Password
-      </label>
+      <label className="flex cursor-pointer items-start gap-2.5 text-sm text-slate-600">
+        <input
+          type="checkbox"
+          checked={accepted}
+          onChange={(e) => {
+            setAccepted(e.target.checked);
+            setError("");
+          }}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-brand-600"
+        />
 
-      <input
-        type="password"
-        name="confirmPassword"
-        value={formData.confirmPassword}
-        onChange={changeHandler}
-        placeholder="Confirm your password"
-        className="w-full rounded-xl border border-slate-200 px-4 py-4 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition"
-      />
-
-    </div>
-
-    <div className="flex gap-3 text-sm text-slate-500">
-      <input type="checkbox" />
-      <p>
-        I agree to the
-        <span className="text-blue-600 cursor-pointer">
-          {" "}Terms of Service
+        <span>
+          I agree to the terms of service and privacy policy, and understand
+          MediDecode does not replace medical advice.
         </span>
-        {" "}and{" "}
-        <span className="text-blue-600 cursor-pointer">
-          Privacy Policy
-        </span>
-      </p>
-    </div>
+      </label>
 
-    <button
-      onClick={submitHandler}
-      disabled={loading}
-      className="w-full rounded-xl bg-blue-600 py-4 text-lg font-semibold text-white transition hover:bg-blue-700"
-    >
-      {loading ? "Creating..." : "Create Account"}
-    </button>
-
-    <div className="flex items-center gap-4">
-      <div className="h-[1px] flex-1 bg-slate-200"></div>
-      <span className="text-sm text-slate-400">
-        or continue with
-      </span>
-      <div className="h-[1px] flex-1 bg-slate-200"></div>
-    </div>
-
-    <div className="grid grid-cols-2 gap-4">
-
-      <button className="border border-slate-200 rounded-xl py-3 font-medium hover:bg-slate-50 transition">
-        Google
+      <button
+        type="submit"
+        disabled={loading}
+        className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 text-sm font-semibold text-white shadow-sm shadow-brand-900/20 transition hover:bg-brand-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
+      >
+        {loading && <Loader2 size={17} className="animate-spin" />}
+        {loading ? "Creating account..." : "Create account"}
       </button>
 
-      <button className="border border-slate-200 rounded-xl py-3 font-medium hover:bg-slate-50 transition">
-        Apple
-      </button>
-
-    </div>
-
-  </div>
-)
+      <p className="text-center text-sm text-slate-500">
+        Already have an account?{" "}
+        <Link
+          href="/auth/login"
+          className="font-semibold text-brand-700 transition hover:text-brand-800"
+        >
+          Sign in
+        </Link>
+      </p>
+    </form>
+  );
 }
-
-export default RegisterForm;

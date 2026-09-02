@@ -1,34 +1,87 @@
-import { CheckCircle2, Clock3 } from "lucide-react";
+import {
+  CheckCircle2,
+  Clock3,
+  Loader2,
+  Siren,
+  TriangleAlert,
+  XCircle,
+} from "lucide-react";
 
-export type ReportStatus = "GOOD" | "ATTENTION" | "PENDING";
+type Props = {
+  // Health outcome from the analysis, missing until it finishes.
+  status?: string | null;
+  // Pipeline status of the report itself.
+  reportStatus?: string | null;
+};
 
-export function StatusBadge({
-  status,
-}: {
-  status: ReportStatus;
-}) {
-  switch (status) {
-    case "GOOD":
-      return (
-        <span className="flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
-          <CheckCircle2 size={16} />
-          Healthy
-        </span>
-      );
+const healthStyles: Record<
+  string,
+  { label: string; className: string; icon: typeof CheckCircle2 }
+> = {
+  GOOD: {
+    label: "Healthy",
+    className: "bg-emerald-50 text-emerald-700",
+    icon: CheckCircle2,
+  },
+  NEEDS_REVIEW: {
+    label: "Needs review",
+    className: "bg-amber-50 text-amber-700",
+    icon: TriangleAlert,
+  },
+  CRITICAL: {
+    label: "Critical",
+    className: "bg-red-50 text-red-700",
+    icon: Siren,
+  },
+};
 
-    case "ATTENTION":
-      return (
-        <span className="rounded-full bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700">
-          Attention
-        </span>
-      );
+const pipelineStyles: Record<
+  string,
+  { label: string; className: string; icon: typeof CheckCircle2 }
+> = {
+  UPLOADED: {
+    label: "Not analyzed",
+    className: "bg-slate-100 text-slate-600",
+    icon: Clock3,
+  },
+  PROCESSING: {
+    label: "Analyzing",
+    className: "bg-blue-50 text-blue-700",
+    icon: Loader2,
+  },
+  FAILED: {
+    label: "Failed",
+    className: "bg-red-50 text-red-700",
+    icon: XCircle,
+  },
+};
 
-    default:
-      return (
-        <span className="flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-600">
-          <Clock3 size={16} />
-          Pending
-        </span>
-      );
-  }
+export function StatusBadge({ status, reportStatus }: Props) {
+  const pipeline = (reportStatus || "").toUpperCase();
+
+  // Before the analysis completes, the pipeline state is the truth.
+  const config =
+    pipeline && pipeline !== "COMPLETED"
+      ? pipelineStyles[pipeline]
+      : healthStyles[(status || "").toUpperCase()];
+
+  const resolved = config ?? {
+    label: "Pending",
+    className: "bg-slate-100 text-slate-600",
+    icon: Clock3,
+  };
+
+  const Icon = resolved.icon;
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${resolved.className}`}
+    >
+      <Icon
+        size={14}
+        className={pipeline === "PROCESSING" ? "animate-spin" : ""}
+      />
+      {resolved.label}
+    </span>
+  );
 }

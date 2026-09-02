@@ -3,16 +3,14 @@
 import { useRouter, useSearchParams } from "next/navigation";
 
 const tabs = [
-  { label: "All Reports", value: "all" },
+  { label: "All reports", value: "all" },
   { label: "Analyzed", value: "completed" },
-  { label: "Pending Analysis", value: "uploaded" },
+  { label: "Pending", value: "uploaded" },
 ];
 
 export default function ReportTabs() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  console.log(searchParams);
 
   const currentStatus = searchParams.get("status") ?? "all";
 
@@ -25,15 +23,16 @@ export default function ReportTabs() {
       params.set("status", status);
     }
 
-    // Reset pagination whenever tab changes
+    // Any change of tab starts again from the first page.
     params.set("page", "1");
+    params.delete("welcome");
 
-    router.push(`/dashboard/reports?${params.toString()}`);
+    router.push(`/reports?${params.toString()}`);
   };
 
   return (
-    <div className="border-b border-slate-200 px-6">
-      <div className="flex gap-8">
+    <div className="scrollbar-slim overflow-x-auto border-b border-slate-200 px-4 sm:px-5">
+      <div className="flex gap-1">
         {tabs.map((tab) => {
           const active = currentStatus === tab.value;
 
@@ -41,16 +40,16 @@ export default function ReportTabs() {
             <button
               key={tab.value}
               onClick={() => handleTabChange(tab.value)}
-              className={`relative py-3 text-sm font-medium transition-colors ${
+              className={`relative whitespace-nowrap px-3 py-3 text-sm font-medium transition-colors ${
                 active
-                  ? "text-blue-600"
+                  ? "text-brand-700"
                   : "text-slate-500 hover:text-slate-900"
               }`}
             >
               {tab.label}
 
               {active && (
-                <span className="absolute bottom-0 left-0 h-[2.5px] w-full rounded-full bg-blue-600" />
+                <span className="absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-brand-600" />
               )}
             </button>
           );

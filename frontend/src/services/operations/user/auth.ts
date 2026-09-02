@@ -124,11 +124,12 @@ export const getCurrentUser = async (cookie?: string) => {
 
     return response.data;
   } catch (err: any) {
-    console.log("Getting user error --->", err);
-
+    // A signed out visitor is expected, so it is not logged as a failure.
     if (err?.response?.status === 401) {
       return null;
     }
+
+    console.log("Getting user error --->", err);
 
     throw new Error(
       err?.response?.data?.message || "Failed to fetch user"

@@ -1,137 +1,160 @@
+"use client";
 
-"use client"
-import { register, signin } from '@/services/operations/user/auth';
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff, Loader2, Lock, Mail, TriangleAlert } from "lucide-react";
 
-function LoginForm() {
-    
-    const router = useRouter();
-    const {fetchUser} = useAuth();
+import { signin } from "@/services/operations/user/auth";
+import { useAuth } from "@/context/AuthContext";
 
-    const[formData , setFormData] = useState({email : "" , password : ""});
-    const [loading , setLoading] = useState(false);
+export const inputClass =
+  "h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-11 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-100";
 
-    const changeHandler = (e : any) => {
+export default function LoginForm() {
+  const router = useRouter();
+  const { fetchUser } = useAuth();
 
-        const {name , value} = e.target;
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-        setFormData((prev : any) => {
-            return {
-                ...prev,
-                [name] : value
-            }
-        })
+  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setError("");
+  };
+
+  const submitHandler = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.email.trim() || !formData.password) {
+      setError("Please enter your email and password.");
+      return;
     }
 
-    const submitHandler = async() => {
-        try{
+    try {
+      setLoading(true);
+      setError("");
 
-            setLoading(true);
+      await signin(formData);
 
-            await signin(formData);
+      await fetchUser();
 
-            await fetchUser();
+      // Straight into the reports list, with a welcome note.
+      router.push("/reports?welcome=1");
+      router.refresh();
+    } catch (err: any) {
+      console.log("Error comes in LoginForm Submit Handler", err);
 
-            router.push('/dashboard');
-
-        } catch(err) {
-            console.log("Error comes in LoginForm Submit Handler" , err);
-
-        } finally{
-            setLoading(false);
-        }
+      setError(err?.message || "We could not sign you in. Please try again.");
+    } finally {
+      setLoading(false);
     }
+  };
 
+  return (
+    <form onSubmit={submitHandler} className="space-y-5">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+          Sign in
+        </h1>
 
-return (
-  <div className="space-y-6">
+        <p className="mt-1.5 text-sm text-slate-500">
+          Welcome back. Enter your details to continue.
+        </p>
+      </div>
 
-    <div>
-      <h2 className="text-5xl font-bold text-slate-900">
-        Sign In
-      </h2>
+      {error && (
+        <div className="flex animate-fade-down items-start gap-2.5 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-700">
+          <TriangleAlert size={17} className="mt-0.5 shrink-0" />
+          {error}
+        </div>
+      )}
 
-      <p className="mt-2 text-slate-500">
-        Welcome back! Please sign in to continue
-      </p>
-    </div>
+      <div>
+        <label
+          htmlFor="email"
+          className="mb-1.5 block text-sm font-medium text-slate-700"
+        >
+          Email address
+        </label>
 
-    <div>
+        <div className="relative">
+          <Mail
+            size={17}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+          />
 
-      <label className="block mb-2 text-sm font-semibold text-slate-700">
-        Email Address
-      </label>
+          <input
+            id="email"
+            type="email"
+            name="email"
+            autoComplete="email"
+            value={formData.email}
+            onChange={changeHandler}
+            placeholder="you@example.com"
+            className={inputClass}
+          />
+        </div>
+      </div>
 
-      <input
-        type="email"
-        name="email"
-        value={formData.email}
-        onChange={changeHandler}
-        placeholder="Enter your email address"
-        className="w-full rounded-xl border border-slate-200 px-4 py-4 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition"
-      />
+      <div>
+        <label
+          htmlFor="password"
+          className="mb-1.5 block text-sm font-medium text-slate-700"
+        >
+          Password
+        </label>
 
-    </div>
+        <div className="relative">
+          <Lock
+            size={17}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+          />
 
-    <div>
+          <input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            name="password"
+            autoComplete="current-password"
+            value={formData.password}
+            onChange={changeHandler}
+            placeholder="Enter your password"
+            className={inputClass}
+          />
 
-      <label className="block mb-2 text-sm font-semibold text-slate-700">
-        Password
-      </label>
-
-      <input
-        type="password"
-        name="password"
-        value={formData.password}
-        onChange={changeHandler}
-        placeholder="Enter your password"
-        className="w-full rounded-xl border border-slate-200 px-4 py-4 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition"
-      />
-
-    </div>
-
-    <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+          >
+            {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+          </button>
+        </div>
+      </div>
 
       <button
-        className="text-sm text-blue-600 hover:underline"
+        type="submit"
+        disabled={loading}
+        className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 text-sm font-semibold text-white shadow-sm shadow-brand-900/20 transition hover:bg-brand-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
       >
-        Forgot password?
+        {loading && <Loader2 size={17} className="animate-spin" />}
+        {loading ? "Signing in..." : "Sign in"}
       </button>
 
-    </div>
-
-    <button
-      onClick={submitHandler}
-      disabled={loading}
-      className="w-full rounded-xl bg-blue-600 py-4 text-lg font-semibold text-white transition hover:bg-blue-700"
-    >
-      {loading ? "Signing In..." : "Sign In"}
-    </button>
-
-    <div className="flex items-center gap-4">
-      <div className="h-[1px] flex-1 bg-slate-200"></div>
-      <span className="text-sm text-slate-400">
-        or continue with
-      </span>
-      <div className="h-[1px] flex-1 bg-slate-200"></div>
-    </div>
-
-    <div className="grid grid-cols-2 gap-4">
-
-      <button className="border border-slate-200 rounded-xl py-3 font-medium hover:bg-slate-50 transition">
-        Google
-      </button>
-
-      <button className="border border-slate-200 rounded-xl py-3 font-medium hover:bg-slate-50 transition">
-        Apple
-      </button>
-
-    </div>
-
-  </div>
-)
+      <p className="text-center text-sm text-slate-500">
+        New to MediDecode?{" "}
+        <Link
+          href="/auth/register"
+          className="font-semibold text-brand-700 transition hover:text-brand-800"
+        >
+          Create an account
+        </Link>
+      </p>
+    </form>
+  );
 }
-
-export default LoginForm

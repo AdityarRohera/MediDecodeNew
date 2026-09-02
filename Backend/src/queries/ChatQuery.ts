@@ -9,7 +9,7 @@ export const getChatQuery = async(resportId : any , userId : any) => {
             SELECT "CHAT_ID" , "USER_ID" , "REPORT_ID" , "CREATED_AT" FROM "CHAT_SESSIONS"
             WHERE "USER_ID" = $1 AND "REPORT_ID" = $2
         `
-        return await pool.query(query , [resportId , userId]);
+        return await pool.query(query , [userId , resportId]);
 
     } catch(err){
         throw err

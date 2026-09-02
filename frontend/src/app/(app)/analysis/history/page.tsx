@@ -6,7 +6,7 @@ import { fetchAllComparisons } from "@/services/operations/reports/report";
 import HistoryTable, {
   ComparisonHistoryItem,
 } from "@/components/analysis/HistoryTable";
-import EmptyState from "@/components/analysis/EmptyState";
+import EmptyState from "@/components/common/EmptyState";
 
 export default async function ComparisonHistoryPage() {
   const cookieStore = await cookies();
@@ -30,6 +30,7 @@ export default async function ComparisonHistoryPage() {
     return (
       <EmptyState
         icon={TriangleAlert}
+        tone="danger"
         title="Could not load your history"
         message="Something went wrong while fetching your saved comparisons. Please refresh the page and try again."
       />
@@ -43,7 +44,7 @@ export default async function ComparisonHistoryPage() {
         title="No comparisons yet"
         message="Every time you compare two reports, it gets saved here so you can open it again later."
         actionLabel="Compare reports"
-        actionHref="/dashboard/analysis/compare"
+        actionHref="/analysis/compare"
       />
     );
   }

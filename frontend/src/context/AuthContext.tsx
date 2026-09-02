@@ -1,19 +1,23 @@
 "use client";
 
-import { getCurrentUser } from "@/services/operations/user/auth";
-
 import {
   createContext,
   useContext,
-  useEffect,
   useState,
   ReactNode,
 } from "react";
 
-interface User {
-  _id: string;
-  name: string;
-  email: string;
+import { getCurrentUser } from "@/services/operations/user/auth";
+
+/*
+    The profile API returns the raw database row, so the field
+    names are the uppercase column names.
+*/
+export interface User {
+  USER_ID: string;
+  NAME: string;
+  EMAIL: string;
+  CREATED_AT?: string;
 }
 
 interface AuthContextType {
@@ -25,62 +29,44 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider = ({
-  children,
-}: {
-  children: ReactNode;
-}) => {
-
+/*
+    Signed in pages are rendered by a server layout that already
+    resolves the user, so this provider never fetches on its own.
+    It holds whatever the app hands it, and the auth forms refresh
+    it after a sign in.
+*/
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  
+  const [loading, setLoading] = useState(false);
 
   const fetchUser = async () => {
-
     try {
+      setLoading(true);
 
       const response = await getCurrentUser();
 
-      console.log("Geting user inside context -----------> " , response);
-
-      setUser(response.user);
-
+      setUser(response?.user ?? null);
     } catch (error) {
+      console.error("Fetch user error:", error);
 
-      console.error("Fetch User Error:", error);
       setUser(null);
-
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
   return (
-    <AuthContext.Provider
-      value={{
-            user,
-            loading,
-            setUser,
-            fetchUser,
-      }}
-    >
+    <AuthContext.Provider value={{ user, loading, setUser, fetchUser }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error(
-      "useAuth must be used inside AuthProvider"
-    );
+    throw new Error("useAuth must be used inside AuthProvider");
   }
 
   return context;

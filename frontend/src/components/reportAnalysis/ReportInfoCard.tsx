@@ -1,9 +1,4 @@
-import {
-  FileText,
-  Calendar,
-  BadgeCheck,
-  Microscope,
-} from "lucide-react";
+import { BadgeCheck, Calendar, FileText, Microscope } from "lucide-react";
 
 interface Props {
   reportName: string;
@@ -16,7 +11,7 @@ interface Props {
 
 const formatDate = (date: string) =>
   date
-    ? new Date(date).toLocaleDateString("en-US", {
+    ? new Date(date).toLocaleDateString("en-IN", {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -31,149 +26,66 @@ export default function ReportInfoCard({
   totalTests,
   totalOrgans,
 }: Props) {
+
+  const rows = [
+    { icon: Microscope, label: "Report type", value: reportType || "General" },
+    { icon: Calendar, label: "Uploaded", value: formatDate(uploadedAt) },
+    { icon: BadgeCheck, label: "Analyzed on", value: formatDate(analyzedAt) },
+  ];
+
   return (
-    <div
-      className="
-      bg-white
-      border
-      border-slate-200
-      rounded-2xl
-      p-5
-      shadow-sm
-    "
-    >
-      {/* Header */}
-
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
       <div className="flex items-center gap-3">
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50">
+          <FileText className="h-5 w-5 text-brand-600" />
+        </span>
 
-        <div
-          className="
-          h-10
-          w-10
-          rounded-xl
-          bg-blue-50
-          flex
-          items-center
-          justify-center
-        "
-        >
-          <FileText className="h-5 w-5 text-blue-600" />
-        </div>
-
-        <div>
+        <div className="min-w-0">
           <h2 className="text-sm font-semibold text-slate-900">
-            Report Details
+            Report details
           </h2>
 
-          <p className="text-xs text-slate-500">
-            Uploaded document
-          </p>
+          <p className="truncate text-xs text-slate-500">{reportName}</p>
         </div>
-
       </div>
-
-      {/* Report Name */}
-
-      <div className="mt-4">
-
-        <h3 className="text-sm font-semibold text-slate-900">
-          {reportName}
-        </h3>
-
-      </div>
-
-      {/* Metadata */}
 
       <div className="mt-4 space-y-3">
+        {rows.map((row) => {
+          const Icon = row.icon;
 
-        <div className="flex items-center gap-3">
-          <Microscope className="w-4 h-4 text-slate-400" />
+          return (
+            <div key={row.label} className="flex items-center gap-3">
+              <Icon className="h-4 w-4 shrink-0 text-slate-400" />
 
-          <div>
-            <p className="text-xs text-slate-400">
-              Report Type
-            </p>
+              <div className="min-w-0">
+                <p className="text-xs text-slate-400">{row.label}</p>
 
-            <p className="text-sm font-medium">
-              {reportType || "General"}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Calendar className="w-4 h-4 text-slate-400" />
-
-          <div>
-            <p className="text-xs text-slate-400">
-              Uploaded
-            </p>
-
-            <p className="text-sm font-medium">
-              {formatDate(uploadedAt)}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <BadgeCheck className="w-4 h-4 text-slate-400" />
-
-          <div>
-            <p className="text-xs text-slate-400">
-              Analyzed On
-            </p>
-
-            <p className="text-sm font-medium">
-              {formatDate(analyzedAt)}
-            </p>
-          </div>
-        </div>
-
+                <p className="truncate text-sm font-medium text-slate-800">
+                  {row.value}
+                </p>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Divider */}
-
-      <div className="h-px bg-slate-100 my-4" />
-
-      {/* Quick Stats */}
-
-      <div className="grid grid-cols-2 gap-3">
-
-        <div
-          className="
-          bg-slate-50
-          rounded-xl
-          p-3
-          text-center
-        "
-        >
-          <p className="text-xl font-bold text-slate-900">
-            {totalTests}
+      <div className="mt-4 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4">
+        <div className="rounded-xl bg-slate-50 p-3 text-center">
+          <p className="text-xl font-semibold text-slate-950">
+            {totalTests ?? 0}
           </p>
 
-          <p className="text-xs text-slate-500 mt-0.5">
-            Tests
-          </p>
+          <p className="mt-0.5 text-xs text-slate-500">Tests</p>
         </div>
 
-        <div
-          className="
-          bg-slate-50
-          rounded-xl
-          p-3
-          text-center
-        "
-        >
-          <p className="text-xl font-bold text-slate-900">
-            {totalOrgans}
+        <div className="rounded-xl bg-slate-50 p-3 text-center">
+          <p className="text-xl font-semibold text-slate-950">
+            {totalOrgans ?? 0}
           </p>
 
-          <p className="text-xs text-slate-500 mt-0.5">
-            Organs
-          </p>
+          <p className="mt-0.5 text-xs text-slate-500">Organs</p>
         </div>
-
       </div>
-
     </div>
   );
 }

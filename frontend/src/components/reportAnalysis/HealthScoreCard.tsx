@@ -1,8 +1,4 @@
-import {
-  CircleCheckBig,
-  TriangleAlert,
-  Siren,
-} from "lucide-react";
+import { CircleCheckBig, Siren, TriangleAlert } from "lucide-react";
 
 type Props = {
   score: number;
@@ -11,168 +7,124 @@ type Props = {
   criticalTests: number;
 };
 
+const RADIUS = 54;
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
 export default function HealthScoreCard({
   score,
   normalTests,
   borderlineTests,
   criticalTests,
 }: Props) {
-  const circumference = 2 * Math.PI * 54;
-  const offset =
-    circumference - (score / 100) * circumference;
+  const offset = CIRCUMFERENCE - (score / 100) * CIRCUMFERENCE;
 
-  const getStatus = () => {
-    if (score >= 80)
-      return {
-        label: "Excellent",
-        color: "text-emerald-600",
-      };
-
-    if (score >= 60)
-      return {
-        label: "Good",
-        color: "text-emerald-600",
-      };
-
-    if (score >= 40)
-      return {
-        label: "Moderate",
-        color: "text-amber-600",
-      };
-
-    return {
-      label: "Critical",
-      color: "text-red-600",
-    };
-  };
-
-  const status = getStatus();
+  const status =
+    score >= 80
+      ? { label: "Excellent", color: "text-emerald-600" }
+      : score >= 60
+      ? { label: "Good", color: "text-emerald-600" }
+      : score >= 40
+      ? { label: "Moderate", color: "text-amber-600" }
+      : { label: "Critical", color: "text-red-600" };
 
   const ringColor =
-    score >= 60 ? "#22C55E" : score >= 40 ? "#F59E0B" : "#EF4444";
+    score >= 60 ? "#10b981" : score >= 40 ? "#f59e0b" : "#ef4444";
+
+  const rows = [
+    {
+      label: "Normal",
+      value: normalTests,
+      icon: CircleCheckBig,
+      color: "text-emerald-500",
+    },
+    {
+      label: "Borderline",
+      value: borderlineTests,
+      icon: TriangleAlert,
+      color: "text-amber-500",
+    },
+    {
+      label: "Critical",
+      value: criticalTests,
+      icon: Siren,
+      color: "text-red-500",
+    },
+  ];
 
   return (
-    <div
-      className="
-      bg-white
-      border
-      border-slate-200
-      rounded-2xl
-      p-5
-      shadow-sm
-      h-full
-      "
-    >
-      <h2 className="text-base font-semibold text-slate-900">
-        Health Score
-      </h2>
+    <div className="h-full rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+      <h2 className="text-sm font-semibold text-slate-900">Health score</h2>
 
-      {/* Score Ring */}
-
-      <div className="flex justify-center mt-5">
-        <div className="relative w-36 h-36">
-
-          <svg
-            width="144"
-            height="144"
-            className="-rotate-90"
-          >
+      <div className="mt-4 flex justify-center">
+        <div className="relative h-36 w-36">
+          <svg width="144" height="144" className="-rotate-90">
             <circle
               cx="72"
               cy="72"
-              r="54"
-              stroke="#E2E8F0"
+              r={RADIUS}
+              stroke="#e2e8f0"
               strokeWidth="10"
               fill="transparent"
             />
 
+            {/* The ring fills in on load rather than snapping. */}
             <circle
               cx="72"
               cy="72"
-              r="54"
+              r={RADIUS}
               stroke={ringColor}
               strokeWidth="10"
               strokeLinecap="round"
               fill="transparent"
-              strokeDasharray={circumference}
+              strokeDasharray={CIRCUMFERENCE}
               strokeDashoffset={offset}
+              className="animate-draw"
+              style={
+                { "--draw-length": CIRCUMFERENCE } as React.CSSProperties
+              }
             />
           </svg>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <h1 className="text-4xl font-bold text-slate-900">
+            <span className="text-4xl font-semibold tracking-tight text-slate-950">
               {score}
-            </h1>
-
-            <span className="text-xs text-slate-400">
-              /100
             </span>
+
+            <span className="text-xs text-slate-400">/100</span>
           </div>
         </div>
       </div>
 
-      {/* Status */}
-
-      <div className="text-center mt-3">
-        <h3
-          className={`text-lg font-semibold ${status.color}`}
-        >
+      <div className="mt-3 text-center">
+        <h3 className={`text-base font-semibold ${status.color}`}>
           {status.label}
         </h3>
 
-        <p className="text-xs text-slate-500 mt-1.5 leading-5">
-          Based on the overall analysis of your
-          laboratory results.
+        <p className="mt-1 text-xs leading-relaxed text-slate-500">
+          Based on the overall analysis of your laboratory results.
         </p>
       </div>
 
-      {/* Divider */}
+      <div className="mt-4 space-y-1.5 border-t border-slate-100 pt-4">
+        {rows.map((row) => {
+          const Icon = row.icon;
 
-      <div className="h-px bg-slate-200 my-4" />
+          return (
+            <div
+              key={row.label}
+              className="flex items-center justify-between rounded-lg px-2 py-1.5 transition hover:bg-slate-50"
+            >
+              <span className="flex items-center gap-2 text-sm text-slate-600">
+                <Icon className={`h-4 w-4 ${row.color}`} />
+                {row.label}
+              </span>
 
-      {/* Quick Stats */}
-
-      <div className="space-y-2.5">
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CircleCheckBig className="h-4 w-4 text-emerald-500" />
-            <span className="text-sm text-slate-600">
-              Normal
-            </span>
-          </div>
-
-          <span className="font-semibold">
-            {normalTests}
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <TriangleAlert className="h-4 w-4 text-amber-500" />
-            <span className="text-sm text-slate-600">
-              Borderline
-            </span>
-          </div>
-
-          <span className="font-semibold">
-            {borderlineTests}
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Siren className="h-4 w-4 text-red-500" />
-            <span className="text-sm text-slate-600">
-              Critical
-            </span>
-          </div>
-
-          <span className="font-semibold">
-            {criticalTests}
-          </span>
-        </div>
-
+              <span className="text-sm font-semibold text-slate-900">
+                {row.value ?? 0}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

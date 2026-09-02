@@ -1,35 +1,64 @@
-
-
 interface ScoreProps {
-  score: number;
+  score: number | null | undefined;
+  size?: number;
 }
 
-export function HealthScoreBadge({
-  score,
-}: ScoreProps) {
-  const colorClass =
-    score >= 85
-      ? "border-emerald-100 bg-emerald-50 text-emerald-700"
-    : score >= 70
-      ? "border-amber-100 bg-amber-50 text-amber-700"
-      : "border-red-100 bg-red-50 text-red-700";
+/*
+    Small score ring used in lists. A report that has not been
+    analyzed has no score, so it renders as a neutral dash instead
+    of a made up number.
+*/
+export function HealthScoreBadge({ score, size = 40 }: ScoreProps) {
+  const hasScore = typeof score === "number";
+
+  const tone = !hasScore
+    ? { ring: "#cbd5e1", text: "text-slate-400" }
+    : score >= 80
+    ? { ring: "#10b981", text: "text-emerald-600" }
+    : score >= 60
+    ? { ring: "#f59e0b", text: "text-amber-600" }
+    : { ring: "#ef4444", text: "text-red-600" };
+
+  const radius = size / 2 - 3;
+  const circumference = 2 * Math.PI * radius;
+
+  const progress = hasScore ? Math.min(100, Math.max(0, score)) : 0;
 
   return (
     <div
-      className={`
-        flex
-        h-10
-        w-10
-        items-center
-        justify-center
-        rounded-full
-        border-4
-        text-sm
-        font-bold
-        ${colorClass}
-    `}
+      className="relative shrink-0"
+      style={{ width: size, height: size }}
+      title={hasScore ? `Health score ${score} of 100` : "Not analyzed yet"}
     >
-      {score}
+      <svg width={size} height={size} className="-rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="#e2e8f0"
+          strokeWidth="3"
+        />
+
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={tone.ring}
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={circumference - (progress / 100) * circumference}
+          className="transition-[stroke-dashoffset] duration-700 ease-out"
+        />
+      </svg>
+
+      <span
+        className={`absolute inset-0 flex items-center justify-center text-xs font-bold ${tone.text}`}
+      >
+        {hasScore ? score : "—"}
+      </span>
     </div>
   );
 }

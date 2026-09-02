@@ -1,11 +1,10 @@
+import type { Metadata } from "next";
+import AuthLayout from "@/components/Authentication/AuthLayout";
 
-import AuthLayout from "@/components/Authentication/AuthLayout"
+export const metadata: Metadata = {
+  title: "Create account · MediDecode",
+};
 
-export default function page() {
-  return (
-    <div>
-      return <AuthLayout authType="Register" />;
-    </div>
-  )
+export default function RegisterPage() {
+  return <AuthLayout authType="Register" />;
 }
-

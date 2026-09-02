@@ -13,13 +13,11 @@ export default function ComparableGroups({
   groups: ComparableGroup[];
 }) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5">
-      <h2 className="text-sm font-semibold text-slate-900">
-        Ready to compare
-      </h2>
+    <section className="animate-fade-up rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+      <h2 className="text-sm font-semibold text-slate-900">Ready to compare</h2>
 
-      <p className="mt-1 text-xs text-slate-500">
-        Reports of the same type can be compared test by test.
+      <p className="mt-0.5 text-xs text-slate-500">
+        Reports of the same type line up test by test.
       </p>
 
       <div className="mt-3 divide-y divide-slate-100">
@@ -37,19 +35,21 @@ export default function ComparableGroups({
                 </p>
 
                 <p className="mt-0.5 text-xs text-slate-500">
-                  {group.count}{" "}
-                  {group.count === 1 ? "report" : "reports"}
+                  {group.count} {group.count === 1 ? "report" : "reports"}
                   {!ready && " · needs 1 more"}
                 </p>
               </div>
 
               {ready ? (
                 <Link
-                  href={`/dashboard/analysis/compare?a=${group.latestTwo[0]}&b=${group.latestTwo[1]}`}
-                  className="flex shrink-0 items-center gap-1.5 rounded-lg bg-cyan-50 px-3 py-2 text-xs font-semibold text-cyan-700 transition hover:bg-cyan-100"
+                  href={`/analysis/compare?a=${group.latestTwo[0]}&b=${group.latestTwo[1]}`}
+                  className="group flex shrink-0 items-center gap-1.5 rounded-lg bg-brand-50 px-3 py-2 text-xs font-semibold text-brand-700 transition hover:bg-brand-100"
                 >
                   Compare latest 2
-                  <ArrowRight size={14} />
+                  <ArrowRight
+                    size={14}
+                    className="transition-transform group-hover:translate-x-0.5"
+                  />
                 </Link>
               ) : (
                 <span className="shrink-0 text-xs text-slate-400">

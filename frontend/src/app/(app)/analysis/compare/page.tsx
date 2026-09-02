@@ -6,7 +6,7 @@ import { normalizeType } from "@/components/analysis/shared";
 
 import ReportPickList from "@/components/analysis/ReportPickList";
 import CompareResult from "@/components/analysis/CompareResult";
-import EmptyState from "@/components/analysis/EmptyState";
+import EmptyState from "@/components/common/EmptyState";
 
 const toSide = (report: any) => ({
   reportId: report.REPORT_ID,
@@ -44,7 +44,7 @@ export default async function ComparePage({ searchParams }: any) {
         title="Nothing to compare yet"
         message="Comparison needs two analyzed reports. Upload one more and we will line them up test by test."
         actionLabel="Upload report"
-        actionHref="/dashboard/upload"
+        actionHref="/upload"
       />
     );
   }
@@ -83,7 +83,7 @@ export default async function ComparePage({ searchParams }: any) {
     : [];
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <ReportPickList reports={analyzed} />
 
       {params?.a && params?.b && !valid && (
@@ -95,14 +95,21 @@ export default async function ComparePage({ searchParams }: any) {
       )}
 
       {mixedTypes && (
-        <p className="flex items-start gap-2 rounded-xl border border-amber-100 bg-amber-50 p-4 text-xs text-amber-800">
-          <TriangleAlert size={15} className="mt-px shrink-0" />
-          These reports are labelled{" "}
-          <span className="font-semibold">{first.REPORT_TYPE || "Unknown"}</span>{" "}
-          and{" "}
-          <span className="font-semibold">{second.REPORT_TYPE || "Unknown"}</span>.
-          Tests that do not appear in both will show as new or not redone.
-        </p>
+        <div className="flex items-start gap-2 rounded-xl border border-amber-100 bg-amber-50 p-4 text-xs leading-relaxed text-amber-800">
+          <TriangleAlert size={15} className="mt-0.5 shrink-0" />
+
+          <p>
+            These reports are labelled{" "}
+            <span className="font-semibold">
+              {first.REPORT_TYPE || "Unknown"}
+            </span>{" "}
+            and{" "}
+            <span className="font-semibold">
+              {second.REPORT_TYPE || "Unknown"}
+            </span>
+            . Tests that do not appear in both will show as new or not redone.
+          </p>
+        </div>
       )}
 
       {valid && (

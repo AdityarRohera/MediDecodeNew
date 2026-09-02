@@ -1,8 +1,8 @@
 import {
-  FlaskConical,
   CircleCheckBig,
-  TriangleAlert,
+  FlaskConical,
   Siren,
+  TriangleAlert,
 } from "lucide-react";
 
 type Props = {
@@ -12,96 +12,55 @@ type Props = {
   variant: "green" | "red" | "yellow" | "purple";
 };
 
+const config = {
+  green: {
+    chip: "bg-emerald-50 text-emerald-700",
+    icon: CircleCheckBig,
+  },
+  red: {
+    chip: "bg-red-50 text-red-700",
+    icon: Siren,
+  },
+  yellow: {
+    chip: "bg-amber-50 text-amber-700",
+    icon: TriangleAlert,
+  },
+  purple: {
+    chip: "bg-violet-50 text-violet-700",
+    icon: FlaskConical,
+  },
+};
+
 export default function StatsCard({
   title,
   value,
   subtitle,
   variant,
 }: Props) {
-  
-  const config = {
-    green: {
-      bg: "bg-emerald-50",
-      iconBg: "bg-emerald-100",
-      iconColor: "text-emerald-600",
-      icon: CircleCheckBig,
-    },
-
-    red: {
-      bg: "bg-red-50",
-      iconBg: "bg-red-100",
-      iconColor: "text-red-600",
-      icon: Siren,
-    },
-
-    yellow: {
-      bg: "bg-amber-50",
-      iconBg: "bg-amber-100",
-      iconColor: "text-amber-600",
-      icon: TriangleAlert,
-    },
-
-    purple: {
-      bg: "bg-violet-50",
-      iconBg: "bg-violet-100",
-      iconColor: "text-violet-600",
-      icon: FlaskConical,
-    },
-  };
-
   const current = config[variant];
   const Icon = current.icon;
 
   return (
-    <div
-      className="
-      bg-white
-      border
-      border-slate-200
-      rounded-2xl
-      p-4
-      transition-all
-      duration-300
-      hover:shadow-md
-      "
-    >
-      <div className="flex items-start justify-between">
-        <div
-          className={`
-          h-10 w-10
-          rounded-xl
-          flex items-center justify-center
-          ${current.iconBg}
-        `}
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 transition duration-300 hover:-translate-y-0.5 hover:shadow-card">
+      <div className="flex items-start justify-between gap-2">
+        <span
+          className={`flex h-9 w-9 items-center justify-center rounded-xl ${current.chip}`}
         >
-          <Icon
-            className={`h-5 w-5 ${current.iconColor}`}
-          />
-        </div>
+          <Icon className="h-4.5 w-4.5" />
+        </span>
 
         <span
-          className={`
-          text-xs
-          font-medium
-          px-2.5 py-1
-          rounded-full
-          ${current.bg}
-          ${current.iconColor}
-        `}
+          className={`rounded-full px-2 py-1 text-xs font-medium ${current.chip}`}
         >
           {subtitle}
         </span>
       </div>
 
-      <div className="mt-4">
-        <p className="text-sm text-slate-500">
-          {title}
-        </p>
+      <p className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
+        {value ?? 0}
+      </p>
 
-        <h2 className="text-3xl font-bold text-slate-900 mt-0.5">
-          {value}
-        </h2>
-      </div>
+      <p className="text-xs text-slate-500">{title}</p>
     </div>
   );
 }

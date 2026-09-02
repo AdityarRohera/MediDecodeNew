@@ -1,8 +1,4 @@
-import {
-  CheckCircle2,
-  AlertTriangle,
-  AlertCircle,
-} from "lucide-react";
+import { AlertCircle, AlertTriangle, CheckCircle2 } from "lucide-react";
 
 type Test = {
   testName: string;
@@ -18,134 +14,83 @@ type Organ = {
   tests: Test[];
 };
 
-interface Props {
-  analysis: Organ[];
-}
+const statusConfig = (status: string) => {
+  switch (status) {
+    case "CRITICAL":
+      return {
+        icon: AlertCircle,
+        iconColor: "text-red-500",
+        badge: "bg-red-50 text-red-700",
+        label: "Critical",
+      };
+
+    case "BORDERLINE":
+      return {
+        icon: AlertTriangle,
+        iconColor: "text-amber-500",
+        badge: "bg-amber-50 text-amber-700",
+        label: "Borderline",
+      };
+
+    default:
+      return {
+        icon: CheckCircle2,
+        iconColor: "text-emerald-500",
+        badge: "bg-emerald-50 text-emerald-700",
+        label: "Normal",
+      };
+  }
+};
 
 export default function OrganSummaryCard({
   analysis,
-}: Props) {
-  const getStatusConfig = (status: string) => {
-    switch (status) {
-      case "CRITICAL":
-        return {
-          icon: AlertCircle,
-          iconColor: "text-red-500",
-          badge:
-            "bg-red-50 text-red-700 border border-red-100",
-        };
-
-      case "BORDERLINE":
-        return {
-          icon: AlertTriangle,
-          iconColor: "text-amber-500",
-          badge:
-            "bg-amber-50 text-amber-700 border border-amber-100",
-        };
-
-      default:
-        return {
-          icon: CheckCircle2,
-          iconColor: "text-emerald-500",
-          badge:
-            "bg-emerald-50 text-emerald-700 border border-emerald-100",
-        };
-    }
-  };
-
+}: {
+  analysis: Organ[];
+}) {
   return (
-    <div
-      className="
-      bg-white
-      rounded-2xl
-      border border-slate-200
-      p-5
-      shadow-sm
-    "
-    >
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-semibold text-slate-900">
-          Organ Analysis
+        <h2 className="text-sm font-semibold text-slate-900">
+          Organ analysis
         </h2>
 
-        <span className="text-sm text-slate-500">
-          {analysis.length} Organs
+        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+          {analysis.length} organs
         </span>
       </div>
 
-      <div className="mt-4 space-y-2.5">
-
+      <div className="mt-4 space-y-2">
         {analysis.map((organ) => {
-          const config = getStatusConfig(
-            organ.organStatus
-          );
-
+          const config = statusConfig(organ.organStatus);
           const Icon = config.icon;
 
           return (
             <div
               key={organ.organName}
-              className="
-              flex
-              items-center
-              justify-between
-              p-3
-              rounded-xl
-              border
-              border-slate-100
-              hover:bg-slate-50
-              transition-colors
-            "
+              className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 p-3 transition hover:border-slate-200 hover:bg-slate-50"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <Icon className={`h-5 w-5 shrink-0 ${config.iconColor}`} />
 
-                <Icon
-                  className={`w-5 h-5 ${config.iconColor}`}
-                />
-
-                <div>
-                  <h3 className="font-medium text-slate-900">
+                <div className="min-w-0">
+                  <h3 className="text-sm font-medium leading-snug text-slate-900">
                     {organ.organName}
                   </h3>
 
                   <p className="text-xs text-slate-500">
-                    {organ.tests.length} Tests
+                    {organ.tests.length} tests
                   </p>
                 </div>
-
               </div>
 
               <span
-                className={`
-                px-2.5 py-1
-                rounded-full
-                text-xs
-                font-semibold
-                ${config.badge}
-              `}
+                className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${config.badge}`}
               >
-                {organ.organStatus}
+                {config.label}
               </span>
             </div>
           );
         })}
-
-      </div>
-
-      <div className="mt-4 pt-4 border-t border-slate-100">
-
-        <div className="flex justify-between text-sm">
-
-          <span className="text-slate-500">
-            Total Organs Analyzed
-          </span>
-
-          <span className="font-semibold">
-            {analysis.length}
-          </span>
-
-        </div>
-
       </div>
     </div>
   );

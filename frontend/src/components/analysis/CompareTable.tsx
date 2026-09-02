@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 import RangeBar from "./RangeBar";
 import {
@@ -17,11 +17,7 @@ type Props = {
   dateB: string;
 };
 
-export default function CompareTable({
-  organs,
-  dateA,
-  dateB,
-}: Props) {
+export default function CompareTable({ organs, dateA, dateB }: Props) {
   const [openOrgans, setOpenOrgans] = useState<string[]>([
     organs[0]?.organName,
   ]);
@@ -37,7 +33,7 @@ export default function CompareTable({
 
   if (organs.length === 0) {
     return (
-      <section className="rounded-xl border border-slate-200 bg-white p-10 text-center">
+      <section className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-card">
         <p className="text-sm text-slate-500">
           No shared tests were found between these two reports.
         </p>
@@ -46,18 +42,16 @@ export default function CompareTable({
   }
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white">
-      <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3">
-        <h2 className="text-sm font-semibold text-slate-900">
-          Test by test
-        </h2>
+    <section className="animate-fade-up overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
+      <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-5 py-3.5">
+        <h2 className="text-sm font-semibold text-slate-900">Test by test</h2>
 
-        <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-600">
+        <label className="flex cursor-pointer items-center gap-2 text-xs font-medium text-slate-600">
           <input
             type="checkbox"
             checked={changedOnly}
             onChange={(e) => setChangedOnly(e.target.checked)}
-            className="h-3.5 w-3.5 accent-cyan-600"
+            className="h-3.5 w-3.5 accent-brand-600"
           />
           Show changed only
         </label>
@@ -81,57 +75,54 @@ export default function CompareTable({
           >
             <button
               onClick={() => toggle(organ.organName)}
-              className="flex w-full items-center gap-3 bg-slate-50 px-5 py-3 text-left transition hover:bg-slate-100"
+              className="flex w-full flex-wrap items-center gap-3 bg-slate-50/80 px-5 py-3 text-left transition hover:bg-slate-100"
             >
-              {open ? (
-                <ChevronDown size={16} className="text-slate-400" />
-              ) : (
-                <ChevronRight size={16} className="text-slate-400" />
-              )}
+              <ChevronDown
+                size={16}
+                className={`shrink-0 text-slate-400 transition-transform duration-200 ${
+                  open ? "" : "-rotate-90"
+                }`}
+              />
 
               <span className="flex-1 text-sm font-semibold text-slate-900">
                 {organ.organName}
               </span>
 
-              {!open && changed > 0 && (
+              {changed > 0 && (
                 <span
-                  className={`text-xs font-medium ${
-                    changeStyle[organ.change].text
-                  }`}
+                  className={`text-xs font-medium ${changeStyle[organ.change].text}`}
                 >
                   {changed} changed
                 </span>
               )}
 
-              <span
-                className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                  statusStyle[organ.statusA].bg
-                } ${statusStyle[organ.statusA].text}`}
-              >
-                {statusStyle[organ.statusA].label}
-              </span>
+              <span className="flex items-center gap-2">
+                <span
+                  className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusStyle[organ.statusA].bg} ${statusStyle[organ.statusA].text}`}
+                >
+                  {statusStyle[organ.statusA].label}
+                </span>
 
-              <span className="text-slate-300">→</span>
+                <span className="text-slate-300">→</span>
 
-              <span
-                className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                  statusStyle[organ.statusB].bg
-                } ${statusStyle[organ.statusB].text}`}
-              >
-                {statusStyle[organ.statusB].label}
+                <span
+                  className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusStyle[organ.statusB].bg} ${statusStyle[organ.statusB].text}`}
+                >
+                  {statusStyle[organ.statusB].label}
+                </span>
               </span>
             </button>
 
             {open && (
-              <>
+              <div className="animate-fade-in">
                 {organ.feedback && (
                   <p className="border-b border-slate-100 px-5 py-3 text-xs leading-relaxed text-slate-500">
                     {organ.feedback}
                   </p>
                 )}
 
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[680px]">
+                <div className="scrollbar-slim overflow-x-auto">
+                  <table className="w-full min-w-[720px]">
                     <thead>
                       <tr className="border-b border-slate-100">
                         <th className="px-5 py-2 text-left text-xs font-medium text-slate-400">
@@ -162,7 +153,7 @@ export default function CompareTable({
 
                     <tbody className="divide-y divide-slate-50">
                       {tests.map((test) => (
-                        <tr key={test.testName}>
+                        <tr key={test.testName} className="hover:bg-slate-50/60">
                           <td className="px-5 py-3">
                             <p className="text-sm font-medium text-slate-900">
                               {test.testName}
@@ -185,25 +176,19 @@ export default function CompareTable({
                           </td>
 
                           <td
-                            className={`px-3 py-3 text-sm ${
-                              statusStyle[test.statusA].text
-                            }`}
+                            className={`px-3 py-3 font-mono text-sm ${statusStyle[test.statusA].text}`}
                           >
                             {test.rawA}
                           </td>
 
                           <td
-                            className={`px-3 py-3 text-sm font-semibold ${
-                              statusStyle[test.statusB].text
-                            }`}
+                            className={`px-3 py-3 font-mono text-sm font-semibold ${statusStyle[test.statusB].text}`}
                           >
                             {test.rawB}
                           </td>
 
                           <td
-                            className={`px-3 py-3 text-xs font-medium ${
-                              changeStyle[test.change].text
-                            }`}
+                            className={`px-3 py-3 text-xs font-medium ${changeStyle[test.change].text}`}
                           >
                             {changeStyle[test.change].label}
                           </td>
@@ -234,7 +219,7 @@ export default function CompareTable({
                     </tbody>
                   </table>
                 </div>
-              </>
+              </div>
             )}
           </div>
         );

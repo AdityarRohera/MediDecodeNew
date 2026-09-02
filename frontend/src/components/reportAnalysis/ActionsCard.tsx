@@ -1,96 +1,89 @@
-import {
-  Download,
-  Share2,
-  BarChart3,
-  FilePenLine,
-} from "lucide-react";
+"use client";
 
-const actions = [
-  {
-    label: "Download",
-    icon: Download,
-  },
-  {
-    label: "Share",
-    icon: Share2,
-  },
-  {
-    label: "Compare",
-    icon: BarChart3,
-  },
-  {
-    label: "Notes",
-    icon: FilePenLine,
-  },
-];
+import Link from "next/link";
+import { useState } from "react";
+import { BarChart3, Check, Download, Share2, Upload } from "lucide-react";
 
-export default function ActionsCard() {
+type Props = {
+  fileUrl?: string;
+};
+
+/*
+    Every action here does something real: open the original file,
+    copy a link to this analysis, jump into a comparison, or upload
+    the next report.
+*/
+export default function ActionsCard({ fileUrl }: Props) {
+  const [copied, setCopied] = useState(false);
+
+  const shareHandler = async () => {
+    await navigator.clipboard.writeText(window.location.href);
+
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const tileClass =
+    "group flex flex-col gap-2 rounded-xl border border-slate-200 p-3 text-left transition hover:border-brand-200 hover:bg-brand-50";
+
+  const iconClass =
+    "flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-700 transition group-hover:bg-white group-hover:text-brand-700";
+
   return (
-    <div
-      className="
-      bg-white
-      border
-      border-slate-200
-      rounded-2xl
-      p-5
-      shadow-sm
-    "
-    >
-      <h2 className="text-sm font-semibold text-slate-900">
-        Quick Actions
-      </h2>
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+      <h2 className="text-sm font-semibold text-slate-900">Quick actions</h2>
 
-      <p className="text-xs text-slate-500 mt-1">
-        Manage and export your report
+      <p className="mt-1 text-xs text-slate-500">
+        Open, share or build on this report
       </p>
 
-      <div className="grid grid-cols-2 gap-2.5 mt-4">
+      <div className="mt-4 grid grid-cols-2 gap-2.5">
+        {fileUrl && (
+          <a
+            href={fileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={tileClass}
+          >
+            <span className={iconClass}>
+              <Download size={16} />
+            </span>
 
-        {actions.map((action) => {
-          const Icon = action.icon;
+            <span className="text-sm font-medium text-slate-900">Original</span>
+          </a>
+        )}
 
-          return (
-            <button
-              key={action.label}
-              className="
-              group
-              p-3
-              rounded-xl
-              border
-              border-slate-200
-              hover:border-blue-200
-              hover:bg-blue-50
-              transition-all
-              duration-200
-              text-left
-            "
-            >
-              <div
-                className="
-                h-9
-                w-9
-                rounded-lg
-                bg-slate-100
-                flex
-                items-center
-                justify-center
-                group-hover:bg-white
-                transition-colors
-              "
-              >
-                <Icon
-                  size={16}
-                  className="text-slate-700"
-                />
-              </div>
+        <button onClick={shareHandler} className={tileClass}>
+          <span className={iconClass}>
+            {copied ? (
+              <Check size={16} className="text-emerald-600" />
+            ) : (
+              <Share2 size={16} />
+            )}
+          </span>
 
-              <p className="mt-2 text-sm font-medium text-slate-900">
-                {action.label}
-              </p>
-            </button>
-          );
-        })}
+          <span className="text-sm font-medium text-slate-900">
+            {copied ? "Link copied" : "Share"}
+          </span>
+        </button>
 
+        <Link href="/analysis/compare" className={tileClass}>
+          <span className={iconClass}>
+            <BarChart3 size={16} />
+          </span>
+
+          <span className="text-sm font-medium text-slate-900">Compare</span>
+        </Link>
+
+        <Link href="/upload" className={tileClass}>
+          <span className={iconClass}>
+            <Upload size={16} />
+          </span>
+
+          <span className="text-sm font-medium text-slate-900">
+            New report
+          </span>
+        </Link>
       </div>
     </div>
   );

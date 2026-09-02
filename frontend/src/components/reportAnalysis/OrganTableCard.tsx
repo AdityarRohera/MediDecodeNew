@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import {
-  ChevronDown,
   AlertCircle,
   AlertTriangle,
   CheckCircle2,
+  ChevronDown,
+  Sparkles,
 } from "lucide-react";
 
 interface Test {
@@ -27,209 +28,170 @@ interface Props {
   defaultOpen?: boolean;
 }
 
-export default function OrganTableCard({
-  organ,
-  defaultOpen = false,
-}: Props) {
-  const [open, setOpen] = useState(defaultOpen);
+const statusBadge: Record<
+  string,
+  { className: string; icon: typeof CheckCircle2 }
+> = {
+  NORMAL: {
+    className: "bg-emerald-50 text-emerald-700",
+    icon: CheckCircle2,
+  },
+  BORDERLINE: {
+    className: "bg-amber-50 text-amber-700",
+    icon: AlertTriangle,
+  },
+  CRITICAL: {
+    className: "bg-red-50 text-red-700",
+    icon: AlertCircle,
+  },
+};
 
-  const normalCount = organ.tests.filter(
-    (t) => t.TEST_STATUS === "NORMAL"
-  ).length;
-
-  const borderlineCount = organ.tests.filter(
-    (t) => t.TEST_STATUS === "BORDERLINE"
-  ).length;
-
-  const criticalCount = organ.tests.filter(
-    (t) => t.TEST_STATUS === "CRITICAL"
-  ).length;
-
-  const badgeStyles = {
-    NORMAL:
-      "bg-emerald-50 text-emerald-700 border border-emerald-100",
-    BORDERLINE:
-      "bg-amber-50 text-amber-700 border border-amber-100",
-    CRITICAL:
-      "bg-red-50 text-red-700 border border-red-100",
+function TestStatusBadge({ status }: { status: string }) {
+  const config = statusBadge[status] ?? {
+    className: "bg-slate-100 text-slate-600",
+    icon: CheckCircle2,
   };
 
-  return (
-    <div
-      className="
-      bg-white
-      rounded-2xl
-      border
-      border-slate-200
-      shadow-sm
-      overflow-hidden
-    "
-    >
-      {/* CLICKABLE HEADER */}
+  const Icon = config.icon;
 
-      <button onClick={() => setOpen(!open)} className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-slate-50 transition">
-        <div>
-          <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold">
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${config.className}`}
+    >
+      <Icon size={13} />
+      {status || "UNKNOWN"}
+    </span>
+  );
+}
+
+export default function OrganTableCard({ organ, defaultOpen = false }: Props) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  const countOf = (status: string) =>
+    organ.tests.filter((test) => test.TEST_STATUS === status).length;
+
+  const criticalCount = countOf("CRITICAL");
+  const borderlineCount = countOf("BORDERLINE");
+  const normalCount = countOf("NORMAL");
+
+  const organTone =
+    organ.organStatus === "CRITICAL"
+      ? "bg-red-50 text-red-700"
+      : organ.organStatus === "BORDERLINE"
+      ? "bg-amber-50 text-amber-700"
+      : "bg-emerald-50 text-emerald-700";
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center gap-3 px-5 py-4 text-left transition hover:bg-slate-50"
+      >
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h2 className="text-sm font-semibold text-slate-900">
               {organ.organName}
             </h2>
 
-            <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${badgeStyles[organ.organStatus as keyof typeof badgeStyles]}`}>
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${organTone}`}
+            >
               {organ.organStatus}
+            </span>
+
+            <span className="text-xs text-slate-400">
+              {organ.tests.length} tests
             </span>
           </div>
 
-          <div className="flex gap-5 mt-2 text-sm">
-            <span className="text-slate-500">
-              {organ.tests.length} Tests
-            </span>
+          <div className="mt-1.5 flex flex-wrap gap-3 text-xs font-medium">
+            {criticalCount > 0 && (
+              <span className="text-red-600">{criticalCount} critical</span>
+            )}
 
-            <span className="text-red-600 font-medium">
-              {criticalCount} Critical
-            </span>
+            {borderlineCount > 0 && (
+              <span className="text-amber-600">
+                {borderlineCount} borderline
+              </span>
+            )}
 
-            <span className="text-amber-600 font-medium">
-              {borderlineCount} Borderline
-            </span>
-
-            <span className="text-emerald-600 font-medium">
-              {normalCount} Normal
-            </span>
+            {normalCount > 0 && (
+              <span className="text-emerald-600">{normalCount} normal</span>
+            )}
           </div>
         </div>
 
         <ChevronDown
-          className={`
-          h-5 w-5 text-slate-500
-          transition-transform duration-300
-          ${open ? "rotate-180" : ""}
-        `}
+          className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-300 ${
+            open ? "rotate-180" : ""
+          }`}
         />
       </button>
 
-      {/* EXPANDABLE CONTENT */}
-
       <div
-        className={`
-        grid
-        transition-all
-        duration-300
-        ease-in-out
-        ${
-          open
-            ? "grid-rows-[1fr] opacity-100"
-            : "grid-rows-[0fr] opacity-0"
-        }
-      `}
+        className={`grid transition-all duration-300 ease-out ${
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        }`}
       >
         <div className="overflow-hidden">
+          {organ.organExplanation && (
+            <div className="border-t border-slate-100 p-5">
+              <div className="rounded-xl border border-brand-100 bg-brand-50/60 p-4">
+                <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                  <Sparkles size={15} className="text-brand-600" />
+                  What this means
+                </h3>
 
-          {/* AI SUMMARY */}
-
-          <div className="border-t border-slate-100 p-5">
-
-            <div
-              className="
-              rounded-xl
-              bg-blue-50
-              border
-              border-blue-100
-              p-4
-            "
-            >
-              <h3 className="text-sm font-semibold text-slate-900">
-                AI Analysis
-              </h3>
-
-              <p className="mt-2 text-sm text-slate-600 leading-6">
-                {organ.organExplanation}
-              </p>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  {organ.organExplanation}
+                </p>
+              </div>
             </div>
+          )}
 
-          </div>
-
-          {/* TABLE */}
-
-          <div className="overflow-x-auto">
-
-            <table className="w-full">
-
-              <thead className="bg-slate-50 border-y border-slate-100">
-
+          <div className="scrollbar-slim overflow-x-auto">
+            <table className="w-full min-w-[560px]">
+              <thead className="border-y border-slate-100 bg-slate-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                    Test
-                  </th>
-
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                    Result
-                  </th>
-
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                    Reference Range
-                  </th>
-
-                  <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-                    Status
-                  </th>
+                  {["Test", "Result", "Reference range", "Status"].map(
+                    (heading) => (
+                      <th
+                        key={heading}
+                        className="px-5 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
+                      >
+                        {heading}
+                      </th>
+                    )
+                  )}
                 </tr>
-
               </thead>
 
-              <tbody>
-
-                {organ.tests.map((test) => (
+              <tbody className="divide-y divide-slate-100">
+                {organ.tests.map((test, index) => (
                   <tr
-                    // key={test.testName}
-                    className="
-                    border-b
-                    border-slate-100
-                    hover:bg-slate-50
-                  "
+                    key={`${test.TEST_NAME}-${index}`}
+                    className="transition hover:bg-slate-50"
                   >
-                    <td className="px-6 py-3.5 text-sm font-medium">
+                    <td className="px-5 py-3 text-sm font-medium text-slate-900">
                       {test.TEST_NAME}
                     </td>
 
-                    <td className="px-6 py-3.5 text-sm font-semibold">
+                    <td className="px-5 py-3 font-mono text-sm font-semibold text-slate-900">
                       {test.RESULT}
                     </td>
 
-                    <td className="px-6 py-3.5 text-sm text-slate-500">
+                    <td className="px-5 py-3 font-mono text-sm text-slate-500">
                       {test.REFERENCE_RANGE || "-"}
                     </td>
 
-                    <td className="px-6 py-3.5">
-                      {test.TEST_STATUS === "NORMAL" && (
-                        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
-                          <CheckCircle2 size={14} />
-                          NORMAL
-                        </span>
-                      )}
-
-                      {test.TEST_STATUS === "BORDERLINE" && (
-                        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-semibold">
-                          <AlertTriangle size={14} />
-                          BORDERLINE
-                        </span>
-                      )}
-
-                      {test.TEST_STATUS === "CRITICAL" && (
-                        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-semibold">
-                          <AlertCircle size={14} />
-                          CRITICAL
-                        </span>
-                      )}
+                    <td className="px-5 py-3">
+                      <TestStatusBadge status={test.TEST_STATUS} />
                     </td>
                   </tr>
                 ))}
-
               </tbody>
-
             </table>
-
           </div>
-
         </div>
       </div>
     </div>

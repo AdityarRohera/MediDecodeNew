@@ -1,9 +1,3 @@
-
-
-// user api
-import dotenv from 'dotenv'
-// dotenv.config();
-
 export const AUTH_ENDPOINTS = {
     REGISTER : '/user/register',
     LOGIN : '/user/login',
