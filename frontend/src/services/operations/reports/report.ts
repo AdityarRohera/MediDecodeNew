@@ -1,6 +1,70 @@
 
-import { BASE_URL , REPORT_ENDPOINTS } from "@/services/ApiConfig";
+import { BASE_URL , COMPARISON_ENDPOINTS, REPORT_ENDPOINTS } from "@/services/ApiConfig";
 import axios from "axios";
+
+
+// COMPARE TWO REPORTS
+export const createComparison = async(report1Id : any , report2Id : any) => {
+
+    console.log('-----------Inside Create Comparison-------------');
+    try{
+
+        const response = await axios.post(
+            `${BASE_URL}${COMPARISON_ENDPOINTS.CREATE}`,
+            { report1Id , report2Id },
+            { withCredentials : true }
+        )
+
+        return response.data;
+
+    } catch(err){
+        console.log("---------Error comes in create comparison----------")
+
+        throw err
+    }
+}
+
+
+// GET ALL SAVED COMPARISONS (history)
+export const fetchAllComparisons = async(params : any = {} , cookieStore : any) => {
+
+    console.log('-----------Inside Fetch All Comparisons-------------');
+    try{
+
+        const response = await axios.get(
+            `${BASE_URL}${COMPARISON_ENDPOINTS.GET}`,
+            { params , headers : {cookie : cookieStore} }
+        )
+
+        return response.data;
+
+    } catch(err){
+        console.log("---------Error comes in fetch all comparisons----------")
+
+        throw err
+    }
+}
+
+
+// GET A SAVED COMPARISON
+export const fetchComparison = async(comparisonId : any) => {
+
+    console.log('-----------Inside Fetch Comparison-------------');
+    try{
+
+        const response = await axios.get(
+            `${BASE_URL}${COMPARISON_ENDPOINTS.GET}/${comparisonId}`,
+            { withCredentials : true }
+        )
+
+        return response.data;
+
+    } catch(err){
+        console.log("---------Error comes in fetch comparison----------")
+
+        throw err
+    }
+}
 
 
 export const fullReportAnalysis = async(reportId : any , cookieStore : any) => {
@@ -39,6 +103,8 @@ export const fetchAllreports = async(params : any = {} , cookieStore : any) => {
         const response = await axios.get(`${BASE_URL}${REPORT_ENDPOINTS.ALL_REPORTS}?` , {
             params , headers : {cookie : cookieStore}
         })
+
+        console.log(response.data)
 
         return response.data;
 

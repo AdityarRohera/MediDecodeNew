@@ -1,14 +1,40 @@
-import { History } from "lucide-react";
+import { cookies } from "next/headers";
+import { History, TriangleAlert } from "lucide-react";
 
-import { getComparisonHistory } from "@/data/analysisData";
+import { fetchAllComparisons } from "@/services/operations/reports/report";
 
-import HistoryTable from "@/components/analysis/HistoryTable";
+import HistoryTable, {
+  ComparisonHistoryItem,
+} from "@/components/analysis/HistoryTable";
 import EmptyState from "@/components/analysis/EmptyState";
-import SampleBadge from "@/components/analysis/SampleBadge";
 
-export default function ComparisonHistoryPage() {
-  // TODO: replace with GET /reports/comparisons once the API is ready.
-  const items = getComparisonHistory();
+export default async function ComparisonHistoryPage() {
+  const cookieStore = await cookies();
+
+  let items: ComparisonHistoryItem[] = [];
+  let total = 0;
+  let failed = false;
+
+  try {
+    const res = await fetchAllComparisons({ limit: 50 }, cookieStore);
+
+    items = res.data?.items ?? [];
+    total = res.data?.total ?? items.length;
+  } catch (err) {
+    console.log("-------Error comes in comparison history-------", err);
+
+    failed = true;
+  }
+
+  if (failed) {
+    return (
+      <EmptyState
+        icon={TriangleAlert}
+        title="Could not load your history"
+        message="Something went wrong while fetching your saved comparisons. Please refresh the page and try again."
+      />
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -24,14 +50,9 @@ export default function ComparisonHistoryPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-500">
-          {items.length} saved{" "}
-          {items.length === 1 ? "comparison" : "comparisons"}
-        </p>
-
-        <SampleBadge />
-      </div>
+      <p className="text-sm text-slate-500">
+        {total} saved {total === 1 ? "comparison" : "comparisons"}
+      </p>
 
       <HistoryTable items={items} />
     </div>

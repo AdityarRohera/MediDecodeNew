@@ -3,9 +3,13 @@
 import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
-import { ComparedOrgan } from "@/data/analysisData";
 import RangeBar from "./RangeBar";
-import { changeStyle, formatShortDate, statusStyle } from "./shared";
+import {
+  changeStyle,
+  ComparedOrgan,
+  formatShortDate,
+  statusStyle,
+} from "./shared";
 
 type Props = {
   organs: ComparedOrgan[];
@@ -30,6 +34,16 @@ export default function CompareTable({
         ? current.filter((name) => name !== organName)
         : [...current, organName]
     );
+
+  if (organs.length === 0) {
+    return (
+      <section className="rounded-xl border border-slate-200 bg-white p-10 text-center">
+        <p className="text-sm text-slate-500">
+          No shared tests were found between these two reports.
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section className="rounded-xl border border-slate-200 bg-white">
@@ -56,6 +70,10 @@ export default function CompareTable({
           ? organ.tests.filter((test) => test.change !== "SAME")
           : organ.tests;
 
+        const changed = organ.tests.filter(
+          (test) => test.change !== "SAME"
+        ).length;
+
         return (
           <div
             key={organ.organName}
@@ -74,6 +92,16 @@ export default function CompareTable({
               <span className="flex-1 text-sm font-semibold text-slate-900">
                 {organ.organName}
               </span>
+
+              {!open && changed > 0 && (
+                <span
+                  className={`text-xs font-medium ${
+                    changeStyle[organ.change].text
+                  }`}
+                >
+                  {changed} changed
+                </span>
+              )}
 
               <span
                 className={`rounded-full px-2.5 py-1 text-xs font-medium ${
@@ -95,97 +123,118 @@ export default function CompareTable({
             </button>
 
             {open && (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[640px]">
-                  <thead>
-                    <tr className="border-b border-slate-100">
-                      <th className="px-5 py-2 text-left text-xs font-medium text-slate-400">
-                        Test
-                      </th>
+              <>
+                {organ.feedback && (
+                  <p className="border-b border-slate-100 px-5 py-3 text-xs leading-relaxed text-slate-500">
+                    {organ.feedback}
+                  </p>
+                )}
 
-                      <th className="px-3 py-2 text-left text-xs font-medium text-slate-400">
-                        Range
-                      </th>
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[680px]">
+                    <thead>
+                      <tr className="border-b border-slate-100">
+                        <th className="px-5 py-2 text-left text-xs font-medium text-slate-400">
+                          Test
+                        </th>
 
-                      <th className="px-3 py-2 text-left text-xs font-medium text-slate-400">
-                        {formatShortDate(dateA)}
-                      </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-slate-400">
+                          Range
+                        </th>
 
-                      <th className="px-3 py-2 text-left text-xs font-medium text-slate-400">
-                        {formatShortDate(dateB)}
-                      </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-slate-400">
+                          {formatShortDate(dateA)}
+                        </th>
 
-                      <th className="px-3 py-2 text-left text-xs font-medium text-slate-400">
-                        Change
-                      </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-slate-400">
+                          {formatShortDate(dateB)}
+                        </th>
 
-                      <th className="px-5 py-2 text-left text-xs font-medium text-slate-400">
-                        Position in range
-                      </th>
-                    </tr>
-                  </thead>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-slate-400">
+                          Change
+                        </th>
 
-                  <tbody className="divide-y divide-slate-50">
-                    {tests.map((test) => (
-                      <tr key={test.testName}>
-                        <td className="px-5 py-3 text-sm font-medium text-slate-900">
-                          {test.testName}
-                        </td>
-
-                        <td className="px-3 py-3 text-xs text-slate-500">
-                          {test.range}
-                        </td>
-
-                        <td
-                          className={`px-3 py-3 text-sm ${
-                            statusStyle[test.statusA].text
-                          }`}
-                        >
-                          {test.valueA}
-                        </td>
-
-                        <td
-                          className={`px-3 py-3 text-sm font-semibold ${
-                            statusStyle[test.statusB].text
-                          }`}
-                        >
-                          {test.valueB}
-                        </td>
-
-                        <td
-                          className={`px-3 py-3 text-xs font-medium ${
-                            changeStyle[test.change].text
-                          }`}
-                        >
-                          {changeStyle[test.change].label}
-                        </td>
-
-                        <td className="px-5 py-3">
-                          <RangeBar
-                            low={test.low}
-                            high={test.high}
-                            valueA={test.valueA}
-                            valueB={test.valueB}
-                            statusA={test.statusA}
-                            statusB={test.statusB}
-                          />
-                        </td>
+                        <th className="px-5 py-2 text-left text-xs font-medium text-slate-400">
+                          Position in range
+                        </th>
                       </tr>
-                    ))}
+                    </thead>
 
-                    {tests.length === 0 && (
-                      <tr>
-                        <td
-                          colSpan={6}
-                          className="px-5 py-4 text-center text-xs text-slate-400"
-                        >
-                          No changed tests in this group.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                    <tbody className="divide-y divide-slate-50">
+                      {tests.map((test) => (
+                        <tr key={test.testName}>
+                          <td className="px-5 py-3">
+                            <p className="text-sm font-medium text-slate-900">
+                              {test.testName}
+                            </p>
+
+                            {test.feedback && (
+                              <p className="mt-0.5 max-w-xs text-xs leading-relaxed text-slate-500">
+                                {test.feedback}
+                              </p>
+                            )}
+                          </td>
+
+                          <td className="px-3 py-3 text-xs text-slate-500">
+                            {test.range || "-"}
+                            {test.unit && (
+                              <span className="block text-slate-400">
+                                {test.unit}
+                              </span>
+                            )}
+                          </td>
+
+                          <td
+                            className={`px-3 py-3 text-sm ${
+                              statusStyle[test.statusA].text
+                            }`}
+                          >
+                            {test.rawA}
+                          </td>
+
+                          <td
+                            className={`px-3 py-3 text-sm font-semibold ${
+                              statusStyle[test.statusB].text
+                            }`}
+                          >
+                            {test.rawB}
+                          </td>
+
+                          <td
+                            className={`px-3 py-3 text-xs font-medium ${
+                              changeStyle[test.change].text
+                            }`}
+                          >
+                            {changeStyle[test.change].label}
+                          </td>
+
+                          <td className="px-5 py-3">
+                            <RangeBar
+                              low={test.low}
+                              high={test.high}
+                              valueA={test.valueA}
+                              valueB={test.valueB}
+                              statusA={test.statusA}
+                              statusB={test.statusB}
+                            />
+                          </td>
+                        </tr>
+                      ))}
+
+                      {tests.length === 0 && (
+                        <tr>
+                          <td
+                            colSpan={6}
+                            className="px-5 py-4 text-center text-xs text-slate-400"
+                          >
+                            No changed tests in this group.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </div>
         );

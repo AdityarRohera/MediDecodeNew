@@ -1,4 +1,4 @@
-import { Comparison } from "@/data/analysisData";
+import { ComparisonStats } from "./shared";
 
 const tiles = [
   { key: "improved", label: "Improved", tone: "text-emerald-600" },
@@ -11,7 +11,7 @@ const tiles = [
 export default function CompareStats({
   stats,
 }: {
-  stats: Comparison["stats"];
+  stats: ComparisonStats;
 }) {
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">

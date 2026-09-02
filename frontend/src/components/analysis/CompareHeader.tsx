@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import { ComparisonSide } from "@/data/analysisData";
+import { ComparisonSide } from "./shared";
 import { formatDate } from "./shared";
 
 type Props = {

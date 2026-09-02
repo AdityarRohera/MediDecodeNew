@@ -226,6 +226,57 @@ export const getFullAnalysisQuery = async(reportId : any) => {
     )
 }
 
+
+export const getFullAnalysisQuery2 = async (
+    reportId: string,
+    userId: string
+) => {
+    return pool.query(
+        `
+            SELECT
+                R.*,
+
+                COALESCE(
+                    json_agg(
+                        json_build_object(
+                            'analysisId', RA."ANALYSIS_ID",
+                            'organName', RA."ORGAN_NAME",
+                            'organStatus', RA."ORGAN_STATUS",
+                            'organExplanation', RA."ORGAN_EXPLANATION",
+                            'createdAt', RA."CREATED_AT",
+
+                            'tests',
+                            (
+                                SELECT COALESCE(
+                                    json_agg(
+                                        row_to_json(TR)
+                                        ORDER BY TR."TEST_NAME"
+                                    ),
+                                    '[]'::json
+                                )
+                                FROM "TEST_RESULTS" TR
+                                WHERE TR."ANALYSIS_ID" = RA."ANALYSIS_ID"
+                            )
+                        )
+                        ORDER BY RA."ORGAN_NAME"
+                    ) FILTER (WHERE RA."ANALYSIS_ID" IS NOT NULL),
+                    '[]'::json
+                ) AS analysis
+
+            FROM "REPORTS" R
+
+            LEFT JOIN "REPORT_ANALYSIS" RA
+                ON RA."REPORT_ID" = R."REPORT_ID"
+
+            WHERE R."REPORT_ID" = $1
+              AND R."USER_ID" = $2
+
+            GROUP BY R."REPORT_ID";
+        `,
+        [reportId, userId]
+    );
+};
+
 export const getAllReports = async (
   userId: string,
   filter: any

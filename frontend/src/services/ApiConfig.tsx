@@ -17,6 +17,11 @@ export const REPORT_ENDPOINTS = {
     ALL_REPORTS : '/reports'
 }
 
+export const COMPARISON_ENDPOINTS = {
+    CREATE : '/report-comparisons',
+    GET : '/report-comparisons'
+}
+
 export const CHAT_ENDPOINTS = {
     GET_CHAT: "/reports",
     SEND_MESSAGE: "/chats",

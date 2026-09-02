@@ -19,8 +19,12 @@ export default function ReportPickList({
 
   const [selected, setSelected] = useState<string[]>([]);
 
-  // Once one report is picked, only its own type stays selectable
-  // so the same tests line up on both sides.
+  /*
+      Report type is free text from the AI, so the same lab report
+      can come back as "Hematology" one time and "Blood Test" the
+      next. Blocking on it would make most real pairs unselectable,
+      so a mismatch is only flagged, never disabled.
+  */
   const pickedType = selected.length
     ? normalizeType(
         reports.find((r: any) => r.REPORT_ID === selected[0])
@@ -59,7 +63,7 @@ export default function ReportPickList({
           </h2>
 
           <p className="mt-1 text-xs text-slate-500">
-            Only reports of the same type can be compared.
+            Pick any two reports. Ones of the same type line up best.
           </p>
         </div>
 
@@ -87,8 +91,7 @@ export default function ReportPickList({
             pickedType !== null &&
             normalizeType(report.REPORT_TYPE) !== pickedType;
 
-          const disabled =
-            !checked && (wrongType || selected.length >= 2);
+          const disabled = !checked && selected.length >= 2;
 
           return (
             <label
